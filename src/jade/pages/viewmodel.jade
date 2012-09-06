@@ -1,0 +1,259 @@
+- var path = '../'
+- var title = 'i18next - webtranslate'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        .row-fluid
+          .span8
+            .hero-unit
+              h2 
+                | viewmodel
+                //- small  - translation made easy
+              p viewmodel is a node.js module for multiple databases. It can be very useful if you work with (d)ddd, cqrs, eventdenormalizer, host, etc. 
+
+          .span4.downloads
+            p node.js:
+            pre
+              code
+                | npm install viewmodel
+
+            p
+              | Build status: 
+              a(href='http://travis-ci.org/adrai/node-viewmodel')
+                img(src='https://secure.travis-ci.org/adrai/node-viewmodel.png')
+
+            .alert.alert-info.feature-description(style='margin-top: 25px;')
+                a(href='https://github.com/adrai/node-viewmodel')
+                  i.icon-github
+                  |  fork me on github
+                br
+                a(href='https://github.com/adrai/node-viewmodel/issues')
+                  i.icon-github
+                  |  issues
+
+        .row-fluid
+          .span12
+            h2 Connecting
+
+            .row-fluid
+              .span4
+                h4.feature-title Connecting to an in-memory repository in read mode
+                p Simply take the read singleton
+                  br
+                  | and call init.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var repo = require('viewmodel').read;
+                      | 
+                      | repo.init(function(err) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Connecting to any repository (mongodb in the example / mode=write)
+                p Simply take the write singleton
+                  br
+                  | and call init with options.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var repo = require('viewmodel').write;
+                      | 
+                      | repo.init(
+                      |     {
+                      |         type: 'mongoDb',
+                      |         host: 'localhost',      // optional
+                      |         port: 27017,            // optional
+                      |         dbName: 'viewmodel',    // optional
+                      |         collectionName: 'dummy',// optional and only if you directly
+                      |                                 // want to use a collection,
+                      |                                 // so repo.extend() is not necessary...
+                      |     }, 
+                      |     function(err) {
+                      |         if(err) {
+                      |             console.log('ohhh :-(');
+                      |             return;
+                      |         }
+                      |     }
+                      | );
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Be sure you have installed the db driver!
+                    p In this example run:
+                    pre
+                      code
+                        | npm install mongodb
+
+        .row-fluid
+          .span12
+            h2 Work with a viewmodel
+
+            .row-fluid
+              .span4
+                h4.feature-title Define a collection
+                p Simply extend the repository with a collectionName.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var dummyRepo = repo.extend({
+                      |     collectionName: 'dummy'
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Create a new viewmodel (only in write mode)
+                p Calling get without an id will generate a new not persisted viewmodel with generated id.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.get(function(err, vm) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     vm.set('myProp', 'myValue');
+                      |     vm.color = 'green';
+                      | 
+                      |     dummyRepo.commit(vm, function(err) {
+                      |     });
+                      |     // or you can call commit directly on vm...
+                      |     vm.commit(function(err) {
+                      |     });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Find...
+                p The query object is like the mongodb query object.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.find({ color: 'green' }, function(err, vms) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     // vms is an array
+                      |     var firstItem = vms[0];
+                      |     console.log('the id: ' + firstItem.id);
+                      |     console.log('the saved value: ' + firstItem.color);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Find/Get by id...
+                p Calling get with an id will try to fetch the preferred viewmodel from the repository.
+                p If an object with such an id does not exists the returning viewmodel is null.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.get('myId', function(err, vm) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     console.log('the id: ' + vm.id);
+                      |     console.log('the saved value: ' + vm.color);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Delete a viewmodel (only in write mode)
+                p Simply call destroy on a viewmodel and commit it.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.get('myId', function(err, vm) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     vm.destroy();
+                      | 
+                      |     dummyRepo.commit(vm, function(err) {
+                      |     });
+                      |     // or you can call commit directly on vm...
+                      |     vm.commit(function(err) {
+                      |     });
+                      | });
+
+        .row-fluid
+          .span12
+            h2 Other helping function
+
+            .row-fluid
+              .span4
+                h4.feature-title Obtain a new id
+                p Simply call getNewId.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.getNewId(function(err, newId) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     console.log('the new id is: ' + newId);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Create an own instance
+                p Simply call create after the read or write singleton.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var repo = require('viewmodel').read.create();
+                      | 
+                      | repo.init(function(err) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p If you develop an own module that will be used by other modules it's recommended to create own instances.
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
