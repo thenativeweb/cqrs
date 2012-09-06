@@ -1,0 +1,140 @@
+- var path = '../../'
+- var title = 'i18next-node - features'
+- var target = 'server'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+    title i18next Documentation: Features
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        include ../includes/doc_hero
+
+        h2 Translation features
+
+        include ../../shared/features
+
+        a(name='postprocessing')
+        h3 post processing translations
+
+        .row-fluid
+          .span4
+            h4.feature-title Adding a post processor
+            p eg. add a post processor parsing markdown.
+
+          .span8
+            .feature
+              pre
+                code
+                  | i18n.addPostProcessor("myProcessorsName", function(value, key, options) {
+                  |   return 'some post processed data based on translated value';
+                  | });
+
+              .alert.alert-info.feature-description
+                p All keys unable to resolve will be send to: 'locales/add/dev/translation'
+
+        .row-fluid
+          .span4
+            h4.feature-title Using a post processor on translation
+
+          .span8
+            .feature
+              pre
+                code
+                  | i18n.t("my.key", { postProcess: "myProcessorsName" }); 
+
+              .alert.alert-info.feature-description
+                p i18next will translate the key as usual. Then it passes the translation text to the post processor.
+
+              .alert.alert-info.feature-description
+                h6 eg. markdown:
+                pre
+                  code
+                    | // given resources with array
+                    | {           
+                    |   'en-US': { 
+                    |     translation: {  
+                    |       "markdownKey": [
+                    |         "### title",
+                    |         "a paragraph",
+                    |         "",
+                    |         "    // some code"
+                    |       ]
+                    |     } 
+                    |   }
+                    | };
+                    | 
+                    | // given registered post processor
+                    | i18n.addPostProcessor("markdown", function(val, key, opts) {
+                    |    return require("markdown").markdown.toHTML(val);
+                    | });
+                    | 
+                    | // you can
+                    | i18n.t("markdownKey", { postProcess: "markdown" }) // -> will output parsed markdown
+
+                h6 eg. jade:
+                pre
+                  code
+                    | // given resources with array
+                    | {           
+                    |   'en-US': { 
+                    |     translation: {  
+                    |       "jadeKey": [
+                    |         "h1 title",
+                    |         "p a paragraph",
+                    |         "p another paragraph",
+                    |         "    button with nested button"
+                    |       ]
+                    |     } 
+                    |   }
+                    | };
+                    | 
+                    | // given registered post processor
+                    | i18n.addPostProcessor("jade", function(val, key, opts) {
+                    |    return require("jade").compile(val, opts)();
+                    | });
+                    | 
+                    | // you can
+                    | i18n.t("jadeKey", { postProcess: "jade" }) // -> will output parsed jade
+
+        a(name='savemissing')
+        h3 save missing resources on server
+
+        .row-fluid
+          .span4
+            h4.feature-title Turn it on:
+
+          .span8
+            .feature
+              pre
+                code 
+                  | i18n.init({ saveMissing: true });
+
+              .alert.alert-info.feature-description
+                p All keys unable to resolve will be saved to: 'locales/en-US/translation.json'
+
+        .row-fluid
+          .span4
+            h4.feature-title Additional Options:
+
+          .span8
+            .feature
+              pre
+                code
+                  | var option = { 
+                  |   // change path to store file
+                  |   resSetPath: 'locales/__lng__/__ns__.json';
+                  | };
+                  | 
+                  | i18n.init(option);
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts

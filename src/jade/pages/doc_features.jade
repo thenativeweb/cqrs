@@ -1,0 +1,104 @@
+- var path = '../'
+- var title = 'i18next - features'
+- var target = 'client'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+    title i18next Documentation: Features
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        include ../includes/doc_hero
+
+        h2 Translation features
+
+        include ../shared/features
+
+        a(name='postprocessing')
+        h3 post processing translations
+
+        .row-fluid
+          .span4
+            h4.feature-title Adding a post processor
+            p eg. add a post processor parsing markdown.
+
+          .span8
+            .feature
+              pre
+                code
+                  | i18n.addPostProcessor("myProcessorsName", function(value, key, options) {
+                  |   return 'some post processed data based on translated value';
+                  | });
+
+              .alert.alert-info.feature-description
+                p All keys unable to resolve will be send to: 'locales/add/dev/translation'
+
+        .row-fluid
+          .span4
+            h4.feature-title Using a post processor on translation
+
+          .span8
+            .feature
+              pre
+                code
+                  | i18n.t("my.key", { postProcess: "myProcessorsName" }); 
+
+              .alert.alert-info.feature-description
+                p i18next will translate the key as usual. Then it passes the translation text to the post processor.
+                p
+                  span.badge.badge-info Hint:
+                  |  Alternatively you can set i18next to always postProcess with a specific postProcessor by init with option postProcess: 
+                  code i18n.init({ postProcess: 'myProcessorsName' });
+
+        a(name='postmissing')
+        h3 send missing resources to server
+
+        .row-fluid
+          .span4
+            h4.feature-title Turn it on:
+
+          .span8
+            .feature
+              pre
+                code
+                  | i18n.init({ sendMissing: true });
+
+              .alert.alert-info.feature-description
+                p All keys unable to resolve will be send to: 'locales/add/dev/translation'
+
+        .row-fluid
+          .span4
+            h4.feature-title Additional Options:
+
+          .span8
+            .feature
+              pre
+                code
+                  | var option = { 
+                  |   // change path
+                  |   resPostPath: 'locales/add/__lng__/__ns__';
+                  | 
+                  |   // change sendType
+                  |   sendType: 'POST|GET'; // default: POST
+                  |   
+                  |   // send missing values to
+                  |   sendMissingTo: 'fallback|current|all'
+                  | 
+                  |   // change async / sync
+                  |   postAsync: true|false; // default: true
+                  | 
+                  | i18n.init(option);
+
+              .alert.alert-info.feature-description
+                p You can send missing values to the fallbackLng, the current language or all languages (eg. 'en-US', 'en', 'fallback')
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
