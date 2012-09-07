@@ -1,0 +1,135 @@
+- var path = '../'
+- var title = 'cqrs - domain'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        .row-fluid
+          .span8
+            .hero-unit
+              h2 
+                | cqrs-domain
+                //- small  - translation made easy
+              p cqrs-domain is a node.js module based on nodeEventStore. It can be very useful as domain component if you work with (d)ddd, cqrs, eventdenormalizer, host, etc.
+
+          .span4.downloads
+            p node.js:
+            pre
+              code
+                | npm install cqrs-domain
+
+            p
+              | Build status: 
+              a(href='http://travis-ci.org/adrai/node-cqrs-domain')
+                img(src='https://secure.travis-ci.org/adrai/node-cqrs-domain.png')
+
+            .alert.alert-info.feature-description(style='margin-top: 25px;')
+                a(href='https://github.com/adrai/node-cqrs-domain')
+                  i.icon-github
+                  |  fork me on github
+                br
+                a(href='https://github.com/adrai/node-cqrs-domain/issues')
+                  i.icon-github
+                  |  issues
+
+        .row-fluid
+          .span12
+            h2 Initialization
+
+            .row-fluid
+              .span4
+                h4.feature-title Require
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var domain = require('cqrs-domain').domain;
+
+            .row-fluid
+              .span4
+                h4.feature-title Register for events
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.on('event', function(evt) {
+                      |     // send to bus
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Configure and initialize
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.initialize({
+                      |     commandHandlersPath: __dirname + '/commandHandlers',
+                      |     aggregatesPath: __dirname + '/aggregates',
+                      |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional
+                      |     sagasPath: __dirname + '/sagas',                // optional
+                      |     publishingInterval: 20,                         // optional
+                      |     snapshotThreshold: 10,                          // optional
+                      |     commandQueue: {                                 // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'domain',
+                      |         collectionName: 'commands',                 // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     },
+                      |     repository: {                                   // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'domain',
+                      |         collectionName: 'sagas',                    // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     },
+                      |     eventStore: {                                   // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'domain',
+                      |         eventsCollectionName: 'events',             // optional
+                      |         snapshotsCollectionName: 'snapshots',       // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     }
+                      | }, function(err) {
+                      |     // ready...
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p The validation rules and business rules should be placed parallel to the aggregates folder.
+                    p In this example "__dirname + '/validationRules'" and "__dirname + '/businessRules'"
+
+            .row-fluid
+              .span4
+                h4.feature-title Handle commands
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.handle({ id: 'msgId', command: 'changeDummy', payload: { id: '23445' } }, function(err) {
+                      |     // saved in command queue...
+                      | });
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
