@@ -252,6 +252,21 @@ html(lang="en")
                     h6 Important hint:
                     p If you develop an own module that will be used by other modules it's recommended to create own instances.
 
+        .row-fluid
+          .span12
+            h2 Database Support
+
+            .row-fluid
+              .span4
+                h4.feature-title Currently these databases are supported:
+
+              .span8
+                .feature
+                  :markdown
+                    - inMemory
+                    - mongoDb ([node-mongodb-native] (https://github.com/mongodb/node-mongodb-native))
+                    - couchDb ([cradle] (https://github.com/cloudhead/cradle))
+
     include ../includes/layout/extra
       
     include ../includes/layout/footer
