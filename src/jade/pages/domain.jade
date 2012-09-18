@@ -64,6 +64,10 @@ html(lang="en")
                       |     // send to bus
                       | });
 
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p The event has these properties: id, event, payload and head(with actual aggregate revision).
+
             .row-fluid
               .span4
                 h4.feature-title Configure and initialize
@@ -75,8 +79,8 @@ html(lang="en")
                       | domain.initialize({
                       |     commandHandlersPath: __dirname + '/commandHandlers',
                       |     aggregatesPath: __dirname + '/aggregates',
-                      |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional
-                      |     sagasPath: __dirname + '/sagas',                // optional
+                      |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional, only if using sagas
+                      |     sagasPath: __dirname + '/sagas',                // optional, only if using sagas
                       |     publishingInterval: 20,                         // optional
                       |     snapshotThreshold: 10,                          // optional
                       |     commandQueue: {                                 // optional
@@ -115,6 +119,9 @@ html(lang="en")
                     h6 Important hint:
                     p The validation rules and business rules should be placed parallel to the aggregates folder.
                     p In this example "__dirname + '/validationRules'" and "__dirname + '/businessRules'"
+                    p The validation rules documentation can be found 
+                      a(href='https://github.com/adrai/rule-validator') here
+                      .
 
             .row-fluid
               .span4
@@ -127,6 +134,126 @@ html(lang="en")
                       | domain.handle({ id: 'msgId', command: 'changeDummy', payload: { id: '23445' } }, function(err) {
                       |     // saved in command queue...
                       | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p The command must have the properties: id, command and payload.
+                    p If you want to check the aggregate revision, the command object needs to have the head property: head: { revision: 1234 }
+
+        .row-fluid
+          .span12
+            h2 Components
+
+            .row-fluid
+              .span4
+                h4.feature-title Aggregate
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var base = require('cqrs-domain').aggregateBase;
+                      | 
+                      | module.exports = base.extend({
+                      |   
+                      |     // Commands
+                      |   
+                      |     createDummy: function(data, callback) {
+                      |         this.apply(this.toEvent('dummyCreated', data));
+                      | 
+                      |         this.checkBusinessRules(callback);
+                      |     },
+                      | 
+                      |     destroyDummy: function(data, callback) {
+                      |         this.apply(this.toEvent('dummyDestroyed', data));
+                      | 
+                      |         this.checkBusinessRules(callback);
+                      |     },
+                      | 
+                      | 
+                      |     // Events
+                      |   
+                      |     dummyCreated: function(data) {
+                      |         this.set(data);
+                      |     },
+                      | 
+                      |     dummyDestroyed: function(data) {
+                      |         this.set('destroyed', true);
+                      |     },
+                      | 
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Save the aggregate in the aggregates folder and name it well. In this example dummyAggregate.js
+                    p In a command function create an event and apply it, when applied optionally you can check the business rules.
+                    p In an event function simply save the event data as you like.
+
+
+            .row-fluid
+              .span4
+                h4.feature-title Business rules
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = {
+                      |     dummyAggregate: [
+                      | 
+                      |         function myRule1(changed, previous, events, callback) {
+                      |             if (changed.a < previous.a) {
+                      |                 callback('a must be bigger than a before!');
+                      |             } else {
+                      |                 callback(null);
+                      |             }
+                      |         }
+                      | 
+                      |     ]
+                      | };
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Save the business rules in the business rules folder.
+
+
+            .row-fluid
+              .span4
+                h4.feature-title Command Handler
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var commandHandlerBase = require('cqrs-domain').commandHandlerBase;
+                      | 
+                      | module.exports = commandHandlerBase.extend({
+                      | 
+                      |     aggregate: 'dummyAggregate',
+                      | 
+                      |     commands: ['createDummy', 'destroyDummy', 'fooIt' ],
+                      | 
+                      |     fooIt: function(id, cmd) {
+                      |         var self = this;
+                      |         (new this.Command({
+                      |             command: 'createFoo',
+                      |             payload: {
+                      |                 name: 'bla'
+                      |             }
+                      |         })).emit(function(evt) {
+                      |             cmd.payload.fooId = evt.payload.id;
+                      |             self.defaultHandle(id, cmd);
+                      |         });
+                      |     }
+                      | 
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Save the command handler in the command handlers folder and name it well. In this example dummyCommandHandler.js
+                    p If you define own handler functions you can do special things like emitting an other command.
+
+
 
     include ../includes/layout/extra
       
