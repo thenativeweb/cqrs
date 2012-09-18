@@ -1,0 +1,183 @@
+- var path = '../'
+- var title = 'cqrs - eventdenormalizer'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        .row-fluid
+          .span8
+            .hero-unit
+              h2 
+                | cqrs-eventdenormalizer
+                //- small  - translation made easy
+              p cqrs-eventdenormalizer  is a node.js module that implements the cqrs pattern. It can be very useful as eventdenormalizer component if you work with (d)ddd, cqrs, domain, host, etc.
+
+          .span4.downloads
+            p node.js:
+            pre
+              code
+                | npm install cqrs-eventdenormalizer
+
+            p
+              | Build status: 
+              a(href='http://travis-ci.org/adrai/node-cqrs-eventdenormalizer')
+                img(src='https://secure.travis-ci.org/adrai/node-cqrs-eventdenormalizer.png')
+
+            .alert.alert-info.feature-description(style='margin-top: 25px;')
+                a(href='https://github.com/adrai/node-cqrs-eventdenormalizer')
+                  i.icon-github
+                  |  fork me on github
+                br
+                a(href='https://github.com/adrai/node-cqrs-eventdenormalizer/issues')
+                  i.icon-github
+                  |  issues
+
+        .row-fluid
+          .span12
+            h2 Initialization
+
+            .row-fluid
+              .span4
+                h4.feature-title Require
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var contextEventDenormalizer = require('cqrs-eventdenormalizer').contextEventDenormalizer;
+
+            .row-fluid
+              .span4
+                h4.feature-title Register for events
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | contextEventDenormalizer.on('event', function(evt) {
+                      |     // send to client, or host...
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p The event has these properties: id, event, payload and head(with actual aggregate revision).
+
+            .row-fluid
+              .span4
+                h4.feature-title Configure and initialize
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | contextEventDenormalizer.initialize({
+                      |     denormalizersPath: __dirname + '/eventDenormalizers',
+                      |     extendersPath: __dirname + '/eventExtenders',
+                      |     eventQueue: {                                   // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'viewmodelDb',
+                      |         collectionName: 'events',                   // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     },
+                      |     repository: {                                   // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'viewmodelDb',
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     }
+                      | }, function(err) {
+                      |     // ready...
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title denormalize events
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | contextEventDenormalizer.denormalize({ id: 'msgId', event: 'dummyCreated', payload: { id: '23445' } }, function(err) {
+                      |     // saved in event queue...
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p The event must have the properties: id, event and payload.
+
+        .row-fluid
+          .span12
+            h2 Components
+
+            .row-fluid
+              .span4
+                h4.feature-title Event denormalizer
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var base = require('cqrs-eventdenormalizer').eventDenormalizerBase;
+                      | 
+                      | module.exports = base.extend({
+                      |   
+                      |     events: ['dummied', {'dummyCreated': 'create'}, {'dummyChanged': 'update'}, {'dummyDeleted': 'delete'}],
+                      |     collectionName: 'dummies',
+                      | 
+                      |     dummied: function(evt, aux, callback) {
+                      |         callback(null);
+                      |     }
+                      | 
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Save the event denormalizer in the denormalizers folder.
+                    p If you want to do default actions like "create", "update" or "delete" use define the events as key/value pair.
+
+            .row-fluid
+              .span4
+                h4.feature-title Event extenders
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var base = require('cqrs-eventdenormalizer').eventExtenderBase;
+                      | 
+                      | module.exports = base.extend({
+                      |   
+                      |     events: ['dummied', 'dummyCreated', 'dummyChanged', 'dummyDeleted'],
+                      |     collectionName: 'dummies',
+                      |
+                      |     defaultAction: function(evt, aux, callback) {
+                      |         callback(null, evt);
+                      |     },
+                      |
+                      |     dummyCreated: function(evt, aux, callback) {
+                      |         callback(null, evt);
+                      |     },
+                      | 
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Save the event extender in the extenders folder.
+                    p If there is not a concrete function for the event then the defaultActio function will be called.
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
