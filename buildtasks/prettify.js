@@ -9,13 +9,25 @@
  */
 var prettify = require('./lib/prettify')
   , path = require('path')
-  , _ = require('underscore');
+  , _ = require('lodash');
 
 module.exports = function(grunt) {
 
   var config = grunt.config;
   var file = grunt.file;
   var log = grunt.log;
+
+  function exePrettify(src, options) {
+    var prettifyFn = function(scr, options) {
+      return src.replace(/<pre><code>[^<]+<\/code><\/pre>/g,
+        function applyHighlight(code) {
+          code = code.match(/<code>([\s\S]+)<\/code>/)[1];
+          code = prettify.prettyPrintOne(code);
+          return "<pre><code>" + code + "</code></pre>";
+        });
+    };
+    return prettifyFn();
+  }
 
   // Compiles Jade templates into HTML. Each input file is renamed with a '.html'
   // extension. The task name specifies the output directory. Options are
@@ -31,24 +43,12 @@ module.exports = function(grunt) {
 
     files.forEach(function (filepath) {
       var opts = _.extend(options, {filename: filepath}); console.log(filepath);
-      var html = grunt.helper('prettify', file.read(filepath), opts);
+      var html = exePrettify(file.read(filepath), opts);
 
       file.write(filepath, html);
 
       log.writeln('File prittified"' + filepath + '" created.');
     });
-  });
-
-  grunt.registerHelper('prettify', function(src, options) {
-    var prettifyFn = function(scr, options) {
-      return src.replace(/<pre><code>[^<]+<\/code><\/pre>/g,
-        function applyHighlight(code) {
-          code = code.match(/<code>([\s\S]+)<\/code>/)[1];
-          code = prettify.prettyPrintOne(code);
-          return "<pre><code>" + code + "</code></pre>";
-        });
-    };
-    return prettifyFn();
   });
 
 };

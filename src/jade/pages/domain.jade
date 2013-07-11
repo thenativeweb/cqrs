@@ -157,6 +157,10 @@ html(lang="en")
                       | 
                       | module.exports = base.extend({
                       |   
+                      |     // snapshotThreshold: 20, 
+                      |     // or
+                      |     // snapshotThreshold: function() { return 12 + 10; },
+                      |   
                       |     // Commands
                       |   
                       |     createDummy: function(data, callback) {
@@ -233,7 +237,7 @@ html(lang="en")
                       |     aggregate: 'dummyAggregate',
                       | 
                       |     commands: ['createDummy', 'destroyDummy', 'fooIt' ],
-                      | 
+                      |
                       |     fooIt: function(id, cmd) {
                       |         var self = this;
                       |         (new this.Command({

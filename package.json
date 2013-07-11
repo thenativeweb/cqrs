@@ -17,9 +17,15 @@
     , "underscore": ">= 0.0.1"
     }
   , "devDependencies": {
-      "grunt": "*"
-    , "grunt-contrib": ">=0.1.0"
-    , "express": ">= 0.0.1"
+      "lodash": "*",
+      "grunt": ">=0.4.1",
+      "grunt-contrib-watch": "~0.2.0",
+      "grunt-contrib-clean": "~0.4.0",
+      "grunt-contrib-cssmin": "~0.4.1",
+      "grunt-contrib-copy": "~0.4.0",
+      "grunt-contrib-watch": ">=0.4.4",
+      "grunt-contrib-jade": "~0.7.0",
+      "express": ">= 0.0.1"
   }
   , "scripts": {}
 }

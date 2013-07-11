@@ -4,7 +4,12 @@
 //
 module.exports = function(grunt) {
 
-  grunt.loadNpmTasks('grunt-contrib');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-jade');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
   grunt.loadTasks("buildtasks");
 
   grunt.initConfig({
@@ -63,12 +68,29 @@ module.exports = function(grunt) {
     },
 
     jade: {
-      "./": [
-        "src/jade/index.jade"
-      ],
-      "pages": [
-        "src/jade/pages/**/*.jade"
-      ]
+      dynamic_mappings: {
+        // Grunt will search for "**/*.jade" under "client/app/modules/" when the "jade" task
+        // runs and build the appropriate src-dest file mappings then, so you
+        // don't need to update the Gruntfile when files are added or removed.
+        files: [
+          {
+            expand: true,                    // Enable dynamic expansion.
+            cwd: './',                   // Src matches are relative to this path.
+            src: ['src/jade/index.jade'],              // Actual pattern(s) to match.
+            dest: './',               // Destination path prefix.
+            ext: '.html',                    // Dest filepaths will have this extension.
+            flatten: true                    // Remove all path parts from generated destination paths.
+          },
+          {
+            expand: true,                    // Enable dynamic expansion.
+            cwd: './',                   // Src matches are relative to this path.
+            src: ['src/jade/pages/**/*.jade'],              // Actual pattern(s) to match.
+            dest: 'pages',               // Destination path prefix.
+            ext: '.html',                    // Dest filepaths will have this extension.
+            flatten: true                    // Remove all path parts from generated destination paths.
+          }
+        ]
+      }
     },
 
     prettify: {
@@ -79,12 +101,21 @@ module.exports = function(grunt) {
     },
 
     copy: {
-      dist: {
-        options: {
-          basePath: "public/test/locales"
-        },
+      // js: {
+      //   options: { basePath: "client/assets/js/libs" },
+      //   files: {
+      //     "client/dist/release/": ["client/assets/js/libs/raphael.js", "client/assets/js/libs/infoviz.js"]
+      //   }
+      // },
+      // css: {
+      //   files: [
+      //     { expand: true, cwd: 'client/assets/css', src: ['client/assets/css/font-awesome-ie7-2.0.css'], dest: 'client/dist/release/' }
+      //   ]
+      // }
+      css: {
+        options: { basePath: "public/test/locales" },
         files: {
-          "pages/locales/": "public/test/locales/**/*"
+          "pages/locales/": ["public/test/locales/**/*"]
         }
       }
     },
@@ -111,14 +142,18 @@ module.exports = function(grunt) {
     // order and concatenate them into a single CSS file named index.css.  It
     // also minifies all the CSS as well.  This is named index.css, because we
     // only want to load one stylesheet in index.html.
-    mincss: {
-      "public/css/index.css": [
-        "public/css/bootstrap-2.0.2.css",
-        "public/css/bootstrap-responsive-2.0.2.css",
-        "public/css/font-awesome-2.0.css",
-        "public/css/prettify.css",
-        "public/css/main.css"
-      ]
+    cssmin: {
+      compress: {
+        files: {
+          "public/css/index.css": [
+            "public/css/bootstrap-2.0.2.css",
+            "public/css/bootstrap-responsive-2.0.2.css",
+            "public/css/font-awesome-2.0.css",
+            "public/css/prettify.css",
+            "public/css/main.css"
+          ]
+        }
+      }
     },
 
     // Takes the built require.js file and minifies it for filesize benefits.
@@ -193,13 +228,13 @@ module.exports = function(grunt) {
 
     watch: {
       jade: {
-        files: "src/jade/**/*.jade",
-        tasks: "build"
+        files: ["src/jade/**/*.jade"],
+        tasks: ["build"]
       },
 
       stylus: {
-        files: "src/stylus/**/*.styl",
-        tasks: "build"
+        files: ["src/stylus/**/*.styl"],
+        tasks: ["build"]
       }
     }
 
@@ -210,7 +245,7 @@ module.exports = function(grunt) {
   // dist/debug/templates.js, compile all the application code into
   // dist/debug/require.js, and then concatenate the require/define shim
   // almond.js and dist/debug/templates.js into the require.js file.
-  grunt.registerTask("default", "clean jade prettify stylus copy");
+  grunt.registerTask("default", ["clean", "jade", "prettify", "stylus", "copy"]);
 
   // The debug task is simply an alias to default to remain consistent with
   // debug/release.
@@ -218,6 +253,6 @@ module.exports = function(grunt) {
 
   // The release task will run the debug tasks and then minify the
   // dist/debug/require.js file and CSS files.
-  grunt.registerTask("build", "default mincss");
+  grunt.registerTask("build", ["default", "cssmin"]);
 
 };

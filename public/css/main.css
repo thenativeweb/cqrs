@@ -81,11 +81,11 @@ textarea {
 .main {
   padding: 2em 0;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #444), color-stop(1, #2b2b2b));
-  background: -webkit-linear-gradient(top, #444 0%, #2b2b2b 100%);
-  background: -moz-linear-gradient(top, #444 0%, #2b2b2b 100%);
-  background: -o-linear-gradient(top, #444 0%, #2b2b2b 100%);
-  background: -ms-linear-gradient(top, #444 0%, #2b2b2b 100%);
-  background: linear-gradient(top, #444 0%, #2b2b2b 100%);
+  background: -webkit-linear-gradient(top, #444 0, #2b2b2b 100%);
+  background: -moz-linear-gradient(top, #444 0, #2b2b2b 100%);
+  background: -o-linear-gradient(top, #444 0, #2b2b2b 100%);
+  background: -ms-linear-gradient(top, #444 0, #2b2b2b 100%);
+  background: linear-gradient(top, #444 0, #2b2b2b 100%);
 }
 .content-container {
   display: block;
@@ -259,11 +259,11 @@ textarea {
   border: solid 1px #e6e6e6;
   border-right: solid 1px #ccc;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e6e6e6), color-stop(1, #ccc));
-  background: -webkit-linear-gradient(top, #e6e6e6 0%, #ccc 100%);
-  background: -moz-linear-gradient(top, #e6e6e6 0%, #ccc 100%);
-  background: -o-linear-gradient(top, #e6e6e6 0%, #ccc 100%);
-  background: -ms-linear-gradient(top, #e6e6e6 0%, #ccc 100%);
-  background: linear-gradient(top, #e6e6e6 0%, #ccc 100%);
+  background: -webkit-linear-gradient(top, #e6e6e6 0, #ccc 100%);
+  background: -moz-linear-gradient(top, #e6e6e6 0, #ccc 100%);
+  background: -o-linear-gradient(top, #e6e6e6 0, #ccc 100%);
+  background: -ms-linear-gradient(top, #e6e6e6 0, #ccc 100%);
+  background: linear-gradient(top, #e6e6e6 0, #ccc 100%);
   text-align: center;
   padding: 20px 10px;
   color: #444;
@@ -271,11 +271,11 @@ textarea {
 }
 .documentation .hero-unit .doc-links .doc-link a:hover {
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #999), color-stop(1, #b3b3b3));
-  background: -webkit-linear-gradient(top, #999 0%, #b3b3b3 100%);
-  background: -moz-linear-gradient(top, #999 0%, #b3b3b3 100%);
-  background: -o-linear-gradient(top, #999 0%, #b3b3b3 100%);
-  background: -ms-linear-gradient(top, #999 0%, #b3b3b3 100%);
-  background: linear-gradient(top, #999 0%, #b3b3b3 100%);
+  background: -webkit-linear-gradient(top, #999 0, #b3b3b3 100%);
+  background: -moz-linear-gradient(top, #999 0, #b3b3b3 100%);
+  background: -o-linear-gradient(top, #999 0, #b3b3b3 100%);
+  background: -ms-linear-gradient(top, #999 0, #b3b3b3 100%);
+  background: linear-gradient(top, #999 0, #b3b3b3 100%);
   text-decoration: none;
 }
 .documentation .hero-unit .doc-links .doc-link a.first {
