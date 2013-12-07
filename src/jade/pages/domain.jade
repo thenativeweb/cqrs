@@ -81,9 +81,9 @@ html(lang="en")
                       |     aggregatesPath: __dirname + '/aggregates',
                       |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional, only if using sagas
                       |     sagasPath: __dirname + '/sagas',                // optional, only if using sagas
-                      |     publishingInterval: 20,                         // optional
-                      |     forkEventDispatching: true,                     // optional
-                      |     snapshotThreshold: 10,                          // optional
+                      |     handleUpdispatchedEvents: true,                 // optional
+                      |     disableQueuing: false                           // optional
+                      |     forcedQueuing: false                            // optional
                       |     commandQueue: {                                 // optional
                       |         type: 'mongoDb',                            // example with mongoDb
                       |         dbName: 'domain',
@@ -92,6 +92,7 @@ html(lang="en")
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
                       |         password: 'pwd'                             // optional
+                      |         timeout: 60 * 1000                          // optional
                       |     },
                       |     repository: {                                   // optional
                       |         type: 'mongoDb',                            // example with mongoDb
@@ -101,6 +102,7 @@ html(lang="en")
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
                       |         password: 'pwd'                             // optional
+                      |         timeout: 60 * 1000                          // optional
                       |     },
                       |     eventStore: {                                   // optional
                       |         type: 'mongoDb',                            // example with mongoDb
@@ -111,6 +113,7 @@ html(lang="en")
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
                       |         password: 'pwd'                             // optional
+                      |         timeout: 60 * 1000                          // optional
                       |     }
                       | }, function(err) {
                       |     // ready...
