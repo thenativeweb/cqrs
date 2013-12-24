@@ -114,7 +114,20 @@ html(lang="en")
                       |         username: 'user',                           // optional
                       |         password: 'pwd'                             // optional
                       |         timeout: 60 * 1000                          // optional
-                      |     }
+                      |     },
+                      |     commandLock: {                                  // optional (used for distributed domain
+                      |                                                     // [handling same aggregate instance on multiple machines])
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'domain',
+                      |         collectionName: 'commandlock',              // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |         timeout: 60 * 1000                          // optional
+                      |     },
+                      |     retryOnConcurrencyTimeout: 800                  // optional (used for distributed domain
+                      |                                                     // [handling same aggregate instance on multiple machines])
                       | }, function(err) {
                       |     // ready...
                       | });
