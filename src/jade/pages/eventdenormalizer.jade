@@ -50,7 +50,7 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | var contextEventDenormalizer = require('cqrs-eventdenormalizer').contextEventDenormalizer;
+                      | var eventDenormalizer = require('cqrs-eventdenormalizer').eventDenormalizer;
 
             .row-fluid
               .span4
@@ -60,7 +60,7 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | contextEventDenormalizer.on('event', function(evt) {
+                      | eventDenormalizer.on('event', function(evt) {
                       |     // send to client, or host...
                       | });
 
@@ -76,12 +76,12 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | contextEventDenormalizer.initialize({
-                      |     denormalizersPath: __dirname + '/eventDenormalizers',
+                      | eventDenormalizer.initialize({
+                      |     viewBuildersPath: __dirname + '/viewBuilders',
                       |     extendersPath: __dirname + '/eventExtenders',
                       |     eventQueue: {                                   // optional
                       |         type: 'mongoDb',                            // example with mongoDb
-                      |         dbName: 'viewmodelDb',
+                      |         dbName: 'myDb',
                       |         collectionName: 'events',                   // optional
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
@@ -90,12 +90,25 @@ html(lang="en")
                       |     },
                       |     repository: {                                   // optional
                       |         type: 'mongoDb',                            // example with mongoDb
-                      |         dbName: 'viewmodelDb',
+                      |         dbName: 'myDb',
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
                       |         password: 'pwd'                             // optional
-                      |     }
+                      |     },
+                      |     revisionGuardStore: {                           // optional
+                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         dbName: 'myDb',
+                      |         collectionName: 'revisionguard',            // optional
+                      |         host: 'localhost',                          // optional
+                      |         port: 27017,                                // optional
+                      |         username: 'user',                           // optional
+                      |         password: 'pwd'                             // optional
+                      |     },
+                      |     ignoreRevision: false,                          // optional
+                      |     disableQueuing: false,                          // optional
+                      |     revisionGuardQueueTimeout: 3000,                // optional
+                      |     revisionGuardQueueTimeoutMaxLoops: 3            // optional
                       | }, function(err) {
                       |     // ready...
                       | });
@@ -108,7 +121,7 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | contextEventDenormalizer.denormalize({ id: 'msgId', event: 'dummyCreated', payload: { id: '23445' } }, function(err) {
+                      | eventDenormalizer.denormalize({ id: 'msgId', event: 'dummyCreated', payload: { id: '23445' } }, function(err) {
                       |     // saved in event queue...
                       | });
 
@@ -122,29 +135,54 @@ html(lang="en")
 
             .row-fluid
               .span4
-                h4.feature-title Event denormalizer
+                h4.feature-title View Builder
 
               .span8
                 .feature
                   pre
                     code
-                      | var base = require('cqrs-eventdenormalizer').eventDenormalizerBase;
+                      | var base = require('cqrs-eventdenormalizer').viewBuilderBase;
                       | 
                       | module.exports = base.extend({
                       |   
-                      |     events: ['dummied', {'dummyCreated': 'create'}, {'dummyChanged': 'update'}, {'dummyDeleted': 'delete'}],
-                      |     collectionName: 'dummies',
-                      | 
-                      |     dummied: function(evt, aux, callback) {
-                      |         callback(null);
-                      |     }
-                      | 
+                      |   events: [
+                      |     'dummied',
+                      |      {
+                      |          event: 'dummyCreated',
+                      |          method: 'create',
+                      |          viewModelId: 'payload.id'
+                      |      },
+                      |      {
+                      |          event: 'dummyChanged',
+                      |          method: 'update',
+                      |          payload: 'payload'
+                      |      },
+                      |      {
+                      |          event: 'dummyDeleted',
+                      |          method: 'delete'
+                      |      },
+                      |      'dummySpezi',
+                      |      'somethingFlushed'
+                      |   ],
+                      |  
+                      |   collectionName: 'dummies',
+                      |  
+                      |   dummied: function(data, vm, evt) {
+                      |   },
+                      |  
+                      |   dummySpezi: function(data, vm, evt) {
+                      |     vm.otherValue = 'value';
+                      |   },
+                      |  
+                      |   somethingFlushed: function(data, vm, evt) {
+                      |   }
+                      |  
                       | });
 
                   .alert.alert-info.feature-description
                     h6 Important hint:
-                    p Save the event denormalizer in the denormalizers folder.
-                    p If you want to do default actions like "create", "update" or "delete" use define the events as key/value pair.
+                    p Save the view builder in the viewBuilders folder.
+                    p If you want to do default actions like "create", "update" or "delete" use define the events in an object.
 
             .row-fluid
               .span4
@@ -175,6 +213,40 @@ html(lang="en")
                     h6 Important hint:
                     p Save the event extender in the extenders folder.
                     p If there is not a concrete function for the event then the defaultActio function will be called.
+
+        .row-fluid
+          .span12
+            h2 Settings for a scalable solution
+
+            .row-fluid
+              .span4
+                h4.feature-title Settings
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | {
+                      |   viewBuildersPath: __dirname + '/viewBuilders',
+                      |   extendersPath: __dirname + '/eventExtenders',
+                      |   eventQueue: { type: 'inMemory', collectionName: 'events' },
+                      |   repository: {
+                      |     type: 'mongoDb',
+                      |     dbName: 'mydb',
+                      |     timeout: 60 * 1000
+                      |   },
+                      |   revisionGuardStore: {
+                      |     type: 'mongoDb',
+                      |     dbName: 'mydb',
+                      |     collectionName: 'revisionguard',
+                      |     timeout: 60 * 1000
+                      |   },
+                      |   ignoreRevision: false,
+                      |   disableQueuing: false,
+                      |   revisionGuardQueueTimeout: 3000,
+                      |   revisionGuardQueueTimeoutMaxLoops: 3
+                      | }
+
 
     include ../includes/layout/extra
       
