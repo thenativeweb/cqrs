@@ -82,8 +82,8 @@ html(lang="en")
                       |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional, only if using sagas
                       |     sagasPath: __dirname + '/sagas',                // optional, only if using sagas
                       |     handleUpdispatchedEvents: true,                 // optional
-                      |     disableQueuing: false                           // optional
-                      |     forcedQueuing: false                            // optional
+                      |     disableQueuing: false,                          // optional
+                      |     forcedQueuing: false,                           // optional
                       |     commandQueue: {                                 // optional
                       |         type: 'mongoDb',                            // example with mongoDb
                       |         dbName: 'domain',
@@ -91,7 +91,7 @@ html(lang="en")
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
-                      |         password: 'pwd'                             // optional
+                      |         password: 'pwd',                            // optional
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     repository: {                                   // optional
@@ -101,7 +101,7 @@ html(lang="en")
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
-                      |         password: 'pwd'                             // optional
+                      |         password: 'pwd',                            // optional
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     eventStore: {                                   // optional
@@ -112,7 +112,7 @@ html(lang="en")
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
-                      |         password: 'pwd'                             // optional
+                      |         password: 'pwd',                            // optional
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     commandLock: {                                  // optional (used for distributed domain
@@ -123,7 +123,7 @@ html(lang="en")
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
                       |         username: 'user',                           // optional
-                      |         password: 'pwd'                             // optional
+                      |         password: 'pwd',                            // optional
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     retryOnConcurrencyTimeout: 800                  // optional (used for distributed domain
@@ -274,7 +274,63 @@ html(lang="en")
                     p Save the command handler in the command handlers folder and name it well. In this example dummyCommandHandler.js
                     p If you define own handler functions you can do special things like emitting an other command.
 
+        .row-fluid
+          .span12
+            h2 Settings for a scalable solution
 
+            .row-fluid
+              .span4
+                h4.feature-title Settings
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | {
+                      |   commandHandlersPath: __dirname + '/commandHandlers',
+                      |   aggregatesPath: __dirname + '/aggregates',
+                      |   sagaHandlersPath: __dirname + '/sagaHandlers',
+                      |   sagasPath: __dirname + '/sagas',
+                      |   handleUpdispatchedEvents: false,
+                      |   disableQueuing: false,
+                      |   forcedQueuing: false,
+                      |   commandQueue: {
+                      |       type: 'inMemory',
+                      |       collectionName: 'commands'
+                      |   },
+                      |   repository: {
+                      |       type: 'mongoDb',
+                      |       dbName: 'domain',
+                      |       collectionName: 'sagas',
+                      |       host: 'localhost',
+                      |       port: 27017,
+                      |       username: 'user',
+                      |       password: 'pwd',
+                      |       timeout: 60 * 1000
+                      |   },
+                      |   eventStore: {
+                      |       type: 'mongoDb',
+                      |       dbName: 'domain',
+                      |       eventsCollectionName: 'events',
+                      |       snapshotsCollectionName: 'snapshots',
+                      |       host: 'localhost',
+                      |       port: 27017,
+                      |       username: 'user',
+                      |       password: 'pwd',
+                      |       timeout: 60 * 1000
+                      |   },
+                      |   commandLock: {
+                      |       type: 'mongoDb',
+                      |       dbName: 'domain',
+                      |       collectionName: 'commandlock',
+                      |       host: 'localhost',
+                      |       port: 27017,
+                      |       username: 'user',
+                      |       password: 'pwd',
+                      |       timeout: 60 * 1000
+                      |   },
+                      |   retryOnConcurrencyTimeout: 800
+                      | }
 
     include ../includes/layout/extra
       
