@@ -81,7 +81,7 @@ html(lang="en")
                       |     aggregatesPath: __dirname + '/aggregates',
                       |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional, only if using sagas
                       |     sagasPath: __dirname + '/sagas',                // optional, only if using sagas
-                      |     handleUpdispatchedEvents: true,                 // optional
+                      |     handleUndispatchedEvents: true,                 // optional
                       |     disableQueuing: false,                          // optional
                       |     forcedQueuing: false,                           // optional
                       |     commandQueue: {                                 // optional
@@ -291,7 +291,7 @@ html(lang="en")
                       |   aggregatesPath: __dirname + '/aggregates',
                       |   sagaHandlersPath: __dirname + '/sagaHandlers',
                       |   sagasPath: __dirname + '/sagas',
-                      |   handleUpdispatchedEvents: false,
+                      |   handleUndispatchedEvents: false,
                       |   disableQueuing: false,
                       |   forcedQueuing: false,
                       |   commandQueue: {
