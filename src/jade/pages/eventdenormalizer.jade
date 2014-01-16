@@ -216,6 +216,47 @@ html(lang="en")
 
         .row-fluid
           .span12
+            h2 Replay
+
+            .row-fluid
+              .span4
+                h4.feature-title handle missing event
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | eventDenormalizer.on('eventMissing', function(aggregateId, aggregateRevision, eventRevision, evt) {
+                      |   console.log(aggregateId, aggregateRevision, eventRevision, evt);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title replay
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | eventDenormalizer.replay([] /* array of ordered events */, function(err) {});
+
+            .row-fluid
+              .span4
+                h4.feature-title replay streamed
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | eventDenormalizer.replayStreamed(function(replay, done) {
+                      |   replay(evt1);
+                      |   replay(evt2);
+                      |   replay(evt3);
+                      |   done(function(err) { });
+                      | });
+
+        .row-fluid
+          .span12
             h2 Settings for a scalable solution
 
             .row-fluid
