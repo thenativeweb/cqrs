@@ -80,7 +80,7 @@ html(lang="en")
                       |     viewBuildersPath: __dirname + '/viewBuilders',
                       |     extendersPath: __dirname + '/eventExtenders',
                       |     eventQueue: {                                   // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'myDb',
                       |         collectionName: 'events',                   // optional
                       |         host: 'localhost',                          // optional
@@ -89,7 +89,7 @@ html(lang="en")
                       |         password: 'pwd'                             // optional
                       |     },
                       |     repository: {                                   // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'myDb',
                       |         host: 'localhost',                          // optional
                       |         port: 27017,                                // optional
@@ -97,7 +97,7 @@ html(lang="en")
                       |         password: 'pwd'                             // optional
                       |     },
                       |     revisionGuardStore: {                           // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'myDb',
                       |         collectionName: 'revisionguard',            // optional
                       |         host: 'localhost',                          // optional
@@ -272,12 +272,12 @@ html(lang="en")
                       |   extendersPath: __dirname + '/eventExtenders',
                       |   eventQueue: { type: 'inMemory', collectionName: 'events' },
                       |   repository: {
-                      |     type: 'mongoDb',
+                      |     type: 'mongodb',
                       |     dbName: 'mydb',
                       |     timeout: 60 * 1000
                       |   },
                       |   revisionGuardStore: {
-                      |     type: 'mongoDb',
+                      |     type: 'mongodb',
                       |     dbName: 'mydb',
                       |     collectionName: 'revisionguard',
                       |     timeout: 60 * 1000

@@ -77,7 +77,7 @@ html(lang="en")
                       | 
                       | repo.init(
                       |     {
-                      |         type: 'mongoDb',
+                      |         type: 'mongodb',
                       |         host: 'localhost',      // optional
                       |         port: 27017,            // optional
                       |         dbName: 'viewmodel',    // optional
@@ -266,7 +266,7 @@ html(lang="en")
                 .feature
                   :markdown
                     - inMemory
-                    - mongoDb ([node-mongodb-native] (https://github.com/mongodb/node-mongodb-native))
+                    - mongodb ([node-mongodb-native] (https://github.com/mongodb/node-mongodb-native))
                     - couchDb ([cradle] (https://github.com/cloudhead/cradle))
 
     include ../includes/layout/extra

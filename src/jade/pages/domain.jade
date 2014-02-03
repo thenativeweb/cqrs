@@ -85,7 +85,7 @@ html(lang="en")
                       |     disableQueuing: false,                          // optional
                       |     forcedQueuing: false,                           // optional
                       |     commandQueue: {                                 // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'domain',
                       |         collectionName: 'commands',                 // optional
                       |         host: 'localhost',                          // optional
@@ -95,7 +95,7 @@ html(lang="en")
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     repository: {                                   // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'domain',
                       |         collectionName: 'sagas',                    // optional
                       |         host: 'localhost',                          // optional
@@ -105,7 +105,7 @@ html(lang="en")
                       |         timeout: 60 * 1000                          // optional
                       |     },
                       |     eventStore: {                                   // optional
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'domain',
                       |         eventsCollectionName: 'events',             // optional
                       |         snapshotsCollectionName: 'snapshots',       // optional
@@ -117,7 +117,7 @@ html(lang="en")
                       |     },
                       |     commandLock: {                                  // optional (used for distributed domain
                       |                                                     // [handling same aggregate instance on multiple machines])
-                      |         type: 'mongoDb',                            // example with mongoDb
+                      |         type: 'mongodb',                            // example with mongodb
                       |         dbName: 'domain',
                       |         collectionName: 'commandlock',              // optional
                       |         host: 'localhost',                          // optional
@@ -299,7 +299,7 @@ html(lang="en")
                       |       collectionName: 'commands'
                       |   },
                       |   repository: {
-                      |       type: 'mongoDb',
+                      |       type: 'mongodb',
                       |       dbName: 'domain',
                       |       collectionName: 'sagas',
                       |       host: 'localhost',
@@ -309,7 +309,7 @@ html(lang="en")
                       |       timeout: 60 * 1000
                       |   },
                       |   eventStore: {
-                      |       type: 'mongoDb',
+                      |       type: 'mongodb',
                       |       dbName: 'domain',
                       |       eventsCollectionName: 'events',
                       |       snapshotsCollectionName: 'snapshots',
@@ -320,7 +320,7 @@ html(lang="en")
                       |       timeout: 60 * 1000
                       |   },
                       |   commandLock: {
-                      |       type: 'mongoDb',
+                      |       type: 'mongodb',
                       |       dbName: 'domain',
                       |       collectionName: 'commandlock',
                       |       host: 'localhost',
