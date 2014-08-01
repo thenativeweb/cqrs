@@ -26,8 +26,13 @@ html(lang="en")
 
             p
               | Build status: 
-              a(href='http://travis-ci.org/adrai/node-viewmodel')
-                img(src='https://secure.travis-ci.org/adrai/node-viewmodel.png')
+              a(href='https://travis-ci.org/adrai/node-viewmodel')
+                img(src='https://img.shields.io/travis/adrai/node-viewmodel.svg')
+
+            p
+              | Release: 
+              a(href='https://npmjs.org/package/viewmodel')
+                img(src='https://img.shields.io/npm/v/viewmodel.svg')
 
             .alert.alert-info.feature-description(style='margin-top: 25px;')
                 a(href='https://github.com/adrai/node-viewmodel')
@@ -45,49 +50,44 @@ html(lang="en")
             .row-fluid
               .span4
                 h4.feature-title Connecting to an in-memory repository in read mode
-                p Simply take the read singleton
-                  br
-                  | and call init.
+                p Simply take the read function
 
               .span8
                 .feature
                   pre
                     code
-                      | var repo = require('viewmodel').read;
+                      | var viewmodel = require('viewmodel');
                       | 
-                      | repo.init(function(err) {
-                      |     if(err) {
-                      |         console.log('ohhh :-(');
-                      |         return;
-                      |     }
-                      | });
+                      | viewmodel.read(function(err, repository) {
+                      |       if(err) {
+                      |           console.log('ohhh :-(');
+                      |           return;
+                      |       }
+                      |  });
 
             .row-fluid
               .span4
                 h4.feature-title Connecting to any repository (mongodb in the example / mode=write)
-                p Simply take the write singleton
+                p Simply take the write function
                   br
-                  | and call init with options.
+                  | and call it with options.
 
               .span8
                 .feature
                   pre
                     code
-                      | var repo = require('viewmodel').write;
+                      | var viewmodel = require('viewmodel');
                       | 
-                      | repo.init(
+                      | viewmodel.write(
                       |     {
                       |         type: 'mongodb',
                       |         host: 'localhost',      // optional
                       |         port: 27017,            // optional
                       |         dbName: 'viewmodel',    // optional
-                      |         collectionName: 'dummy',// optional and only if you directly
-                      |                                 // want to use a collection,
-                      |                                 // so repo.extend() is not necessary...
                       |         username: 'user',       // optional
                       |         password: 'pwd'         // optional
                       |     }, 
-                      |     function(err) {
+                      |     function(err, repository) {
                       |         if(err) {
                       |             console.log('ohhh :-(');
                       |             return;
@@ -136,7 +136,11 @@ html(lang="en")
                       |     }
                       | 
                       |     vm.set('myProp', 'myValue');
-                      |     vm.color = 'green';
+                      |     vm.set('myProp.deep', 'myValueDeep');
+                      | 
+                      |     console.log(vm.toJSON());
+                      | 
+                      |     console.log(vm.has('myProp.deep'));
                       | 
                       |     dummyRepo.commit(vm, function(err) {
                       |     });
@@ -163,7 +167,7 @@ html(lang="en")
                       |     // vms is an array
                       |     var firstItem = vms[0];
                       |     console.log('the id: ' + firstItem.id);
-                      |     console.log('the saved value: ' + firstItem.color);
+                      |     console.log('the saved value: ' + firstItem.get('color'));
                       | });
 
             .row-fluid
@@ -183,7 +187,7 @@ html(lang="en")
                       |     }
                       | 
                       |     console.log('the id: ' + vm.id);
-                      |     console.log('the saved value: ' + vm.color);
+                      |     console.log('the saved value: ' + vm.get('color'));
                       | });
 
             .row-fluid
@@ -232,27 +236,32 @@ html(lang="en")
                       |     console.log('the new id is: ' + newId);
                       | });
 
+        .row-fluid
+          .span12
+            h2 Implementation differences
+
             .row-fluid
               .span4
-                h4.feature-title Create an own instance
-                p Simply call create after the read or write singleton.
+                h4.feature-title mongodb
+                p For mongodb you can define indexes for performance boosts in find function.
 
               .span8
                 .feature
                   pre
                     code
-                      | var repo = require('viewmodel').read.create();
-                      | 
-                      | repo.init(function(err) {
-                      |     if(err) {
-                      |         console.log('ohhh :-(');
-                      |         return;
-                      |     }
+                      | var dummyRepo = repository.extend({
+                      |     collectionName: 'dummy',
+                      |     indexes: [
+                      |         { profileId: 1 },
+                      |         // or:
+                      |         { index: {profileId: 1}, options: {} }
+                      |     ]
                       | });
 
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p If you develop an own module that will be used by other modules it's recommended to create own instances.
+            .row-fluid
+              .span4
+                h4.feature-title redis
+                p The find function does ignore the query argument and always fetches all items in the collection.
 
         .row-fluid
           .span12
@@ -265,9 +274,11 @@ html(lang="en")
               .span8
                 .feature
                   :markdown
-                    - inMemory
+                    - inmemory
                     - mongodb ([node-mongodb-native] (https://github.com/mongodb/node-mongodb-native))
-                    - couchDb ([cradle] (https://github.com/cloudhead/cradle))
+                    - couchdb ([cradle] (https://github.com/cloudhead/cradle))
+                    - tingodb ([tingodb] (https://github.com/sergeyksv/tingodb))
+                    - redis ([redis] (https://github.com/mranney/node_redis))
 
     include ../includes/layout/extra
       
