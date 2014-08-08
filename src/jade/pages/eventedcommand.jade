@@ -1,0 +1,236 @@
+- var path = '../'
+- var title = 'cqrs - viewmodel'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        .row-fluid
+          .span8
+            .hero-unit
+              h2 
+                | evented-command
+                //- small  - translation made easy
+              p Project goal is to provide a simple command/event handling for evented systems like cqrs.
+
+          .span4.downloads
+            p node.js:
+            pre
+              code
+                | npm install evented-command
+
+            p
+              | Build status: 
+              a(href='https://travis-ci.org/adrai/node-evented-command')
+                img(src='https://img.shields.io/travis/adrai/node-evented-command.svg')
+
+            p
+              | Release: 
+              a(href='https://npmjs.org/package/evented-command')
+                img(src='https://img.shields.io/npm/v/evented-command.svg')
+
+            .alert.alert-info.feature-description(style='margin-top: 25px;')
+                a(href='https://github.com/adrai/node-evented-command')
+                  i.icon-github
+                  |  fork me on github
+                br
+                a(href='https://github.com/adrai/node-evented-command/issues')
+                  i.icon-github
+                  |  issues
+
+        .row-fluid
+          .span12
+            h2 Usage
+
+            .row-fluid
+              .span4
+                h4.feature-title Get a new instance...
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var evtCmd = require('evented-command')();
+
+            .row-fluid
+              .span4
+                h4.feature-title CDefine the command structure [optional]
+                p The values describes the path to that property in the command message.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | evtCmd.defineCommand({
+                      |   id: 'id',                       // optional
+                      |   name: 'name',                   // optional
+                      |   context: 'context.name',        // optional
+                      |   aggregate: 'aggregate.name',    // optional
+                      |   aggregateId: 'aggregate.id'     // optional
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Define the event structure [optional]
+                p The values describes the path to that property in the event message.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | evtCmd.defineEvent({
+                      |   correlationId: 'correlationId', // optional
+                      |   id: 'id',                       // optional
+                      |   name: 'name',                   // optional
+                      |   context: 'context.name',        // optional
+                      |   aggregate: 'aggregate.name',    // optional
+                      |   aggregateId: 'aggregate.id'     // optional
+                      | });
+
+        .row-fluid
+          .span12
+            h2 Define the id generator function [optional]
+
+            .row-fluid
+              .span4
+                h4.feature-title you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | evtCmd.idGenerator(function() {
+                      |   var id = require('node-uuid').v4().toString();
+                      |   return id;
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | evtCmd.idGenerator(function(callback) {
+                      |   setTimeout(function() {
+                      |     var id = require('node-uuid').v4().toString();
+                      |     callback(null, id);
+                      |   }, 50);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Wire up commands and events
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // pass in events from your bus
+                      | bus.on('event', function(data){
+                      |   evtCmd.emit('event', data);
+                      | });
+                      | 
+                      | // pass commands to bus
+                      | evtCmd.on('command', function(data) {
+                      |   bus.emit('command', data);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Send commands
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var cmd = new Command({
+                      |   // id: 'my onwn command id', // if you don't pass an id it will generate one, when emitting the command...
+                      |   name: 'changePerson',
+                      |   payload: {
+                      |     name: 'my name'
+                      |   },
+                      |   aggregate: {
+                      |     id: 8,
+                      |     name: 'jack'
+                      |   },
+                      |   context: {
+                      |     name: 'hr'
+                      |   }
+                      | });
+                      | 
+                      | // emit it
+                      | cmd.emit();
+                      | 
+                      | 
+                      | 
+                      | // if you want to observe the command pass a callback
+                      | cmd.emit(function(evt) {
+                      | 
+                      | });
+                      | 
+                      | 
+                      | // if you want to observe the command that generates any events pass an object like this:
+                      | cmd.emit({
+                      | 
+                      |   event1: function(evt) {
+                      | 
+                      |   },
+                      | 
+                      |   event2: function(evt) {
+                      | 
+                      |   }
+                      | 
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Send commands with the speakable api
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | evtCmd.send('changePerson')
+                      |       .for('person') // aggregate name
+                      |       .instance('8') // aggregate id
+                      |       .in('hr')          // context name
+                      |       .with({
+                      |         // id: 'my onwn command id', // if you don't pass an id it will generate one, when emitting the command...
+                      |         revision: '12',
+                      |         payload: {
+                      |             name: 'jack'
+                      |         }
+                      |       })
+                      |       .go(function(evt) {
+                      |         console.log('speakable', evt);
+                      |       });
+                      | 
+                      | evtCmd.send('multi')
+                      |       .for('aggregate')
+                      |       .instance('instanceId')
+                      |       .in('context')
+                      |       .with({
+                      |         revision: '43',
+                      |         payload: 'data2'
+                      |       })
+                      |       .go({
+                      |         event1: function(evt) {
+                      |           console.log('speakable', evt);
+                      |         },
+                      |         event2: function(evt) {
+                      |           console.log('speakable', evt);
+                      |         }
+                      |       });
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
