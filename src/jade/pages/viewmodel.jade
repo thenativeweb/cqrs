@@ -193,6 +193,27 @@ html(lang="en")
 
             .row-fluid
               .span4
+                h4.feature-title Find with query options
+                p The query options object is like the mongodb query object.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.find({ color: 'green' }, { limit: 2, skip: 1 }, function(err, vms) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     // vms is an array
+                      |     var firstItem = vms[0];
+                      |     console.log('the id: ' + firstItem.id);
+                      |     console.log('the saved value: ' + firstItem.get('color'));
+                      | });
+
+            .row-fluid
+              .span4
                 h4.feature-title Find/Get by id...
                 p Calling get with an id will try to fetch the preferred viewmodel from the repository.
                 p If an object with such an id does not exists the returning viewmodel is null.
