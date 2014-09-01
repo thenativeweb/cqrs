@@ -653,6 +653,7 @@ html(lang="en")
             .row-fluid
               .span4
                 h4.feature-title Command Handler (Be careful!!!)
+                p Is your use case not solvable without a custom command handling? Sagas? Micro-Services?
 
               .span8
                 .feature
@@ -689,6 +690,11 @@ html(lang="en")
                       | //    // and at the end perhaps you call: commandHandler.handle(cmd, callback);
                       |   });
                       | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Is your use case not solvable without a custom command handling? Sagas? Micro-Services?
+
 
     include ../includes/layout/extra
       
