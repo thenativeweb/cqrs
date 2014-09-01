@@ -16,7 +16,7 @@ html(lang="en")
               h2 
                 | cqrs-domain
                 //- small  - translation made easy
-              p cqrs-domain is a node.js module based on nodeEventStore. It can be very useful as domain component if you work with (d)ddd, cqrs, eventdenormalizer, host, etc.
+              p cqrs-domain is a node.js module based on node-eventstore. It can be very useful as domain component if you work with (d)ddd, cqrs, eventdenormalizer, host, etc.
 
           .span4.downloads
             p node.js:
@@ -29,6 +29,11 @@ html(lang="en")
               a(href='http://travis-ci.org/adrai/node-cqrs-domain')
                 img(src='https://secure.travis-ci.org/adrai/node-cqrs-domain.png')
 
+            p
+              | Release: 
+              a(href='https://npmjs.org/package/cqrs-domain')
+                img(src='https://img.shields.io/npm/v/cqrs-domain.svg')
+
             .alert.alert-info.feature-description(style='margin-top: 25px;')
                 a(href='https://github.com/adrai/node-cqrs-domain')
                   i.icon-github
@@ -37,129 +42,432 @@ html(lang="en")
                 a(href='https://github.com/adrai/node-cqrs-domain/issues')
                   i.icon-github
                   |  issues
+                br
+                a(href='https://github.com/adrai/node-cqrs-domain/blob/master/releasenotes.md')
+                  i.icon-github
+                  |  release notes
 
         .row-fluid
           .span12
-            h2 Initialization
+            h2 Usage
 
             .row-fluid
               .span4
-                h4.feature-title Require
+                h4.feature-title Configure
 
               .span8
                 .feature
                   pre
                     code
-                      | var domain = require('cqrs-domain').domain;
+                      | var domain = require('cqrs-domain', {
+                      |   // the path to the "working directory"
+                      |   // can be structured like
+                      |   // [set 1](https://github.com/adrai/node-cqrs-domain/tree/1.0/test/integration/fixture/set1) or
+                      |   // [set 2](https://github.com/adrai/node-cqrs-domain/tree/1.0/test/integration/fixture/set2)
+                      |   domainPath: '/path/to/my/files',
+                      |   
+                      |   // optional, default is 'commandRejected'
+                      |   // will be used if an error occurs and an event should be generated
+                      |   commandRejectedEventName: 'rejectedCommand',
+                      |   
+                      |   // optional, default is 800
+                      |   // if using in scaled systems and not guaranteeing that each command for an aggregate instance
+                      |   // dispatches to the same worker process, this module tries to catch the concurrency issues and
+                      |   // retries to handle the command after a timeout between 0 and the defined value
+                      |   retryOnConcurrencyTimeout: 1000,
+                      |   
+                      |   // optional, default is 100
+                      |   // global snapshot threshold value for all aggregates
+                      |   // defines the amount of loaded events, if there are more events to load, it will do a snapshot, so next loading is faster
+                      |   // an individual snapshot threshold defining algorithm can be defined per aggregate (scroll down)
+                      |   snapshotThreshold: 1000,
+                      |   
+                      |   // optional, default is in-memory
+                      |   // currently supports: mongodb, redis, tingodb and inmemory
+                      |   // hint: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
+                      |   eventStore: {
+                      |     type: 'mongodb',
+                      |     host: 'localhost',                          // optional
+                      |     port: 27017,                                // optional
+                      |     dbName: 'domain',                           // optional
+                      |     eventsCollectionName: 'events',             // optional
+                      |     snapshotsCollectionName: 'snapshots',       // optional
+                      |     transactionsCollectionName: 'transactions', // optional
+                      |     timeout: 10000                              // optional
+                      |     // username: 'technicalDbUser',                // optional
+                      |     // password: 'secret'                          // optional
+                      |   },
+                      |       
+                      |   // optional, default is in-memory
+                      |   // currently supports: mongodb, redis, tingodb, couchdb and inmemory
+                      |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
+                      |   aggregateLock: {
+                      |     type: 'redis',
+                      |     host: 'localhost',                          // optional
+                      |     port: 6379,                                 // optional
+                      |     db: 0,                                      // optional
+                      |     prefix: 'domain_aggregate_lock',            // optional
+                      |     timeout: 10000                              // optional
+                      |     // password: 'secret'                          // optional
+                      |   }
+                      | });
 
             .row-fluid
               .span4
-                h4.feature-title Register for events
+                h4.feature-title Catch connect ad disconnect events
 
               .span8
                 .feature
                   pre
                     code
-                      | domain.on('event', function(evt) {
-                      |     // send to bus
+                      | // eventStore
+                      | domain.eventStore.on('connect', function() {
+                      |   console.log('eventStore connected');
+                      | });
+                      | 
+                      | domain.eventStore.on('disconnect', function() {
+                      |   console.log('eventStore disconnected');
+                      | });
+                      | 
+                      | // aggregateLock
+                      | domain.aggregateLock.on('connect', function() {
+                      |   console.log('aggregateLock connected');
+                      | });
+                      | 
+                      | domain.aggregateLock.on('disconnect', function() {
+                      |   console.log('aggregateLock disconnected');
+                      | });
+                      | 
+                      | 
+                      | // anything (eventStore or aggregateLock)
+                      | domain.on('connect', function() {
+                      |   console.log('something connected');
+                      | });
+                      | 
+                      | domain.on('disconnect', function() {
+                      |   console.log('something disconnected');
                       | });
 
                   .alert.alert-info.feature-description
                     h6 Important hint:
-                    p The event has these properties: id, event, payload and head(with actual aggregate revision).
+                    p For example in a cloud environment the disconnect event could be used to kill the process.
 
             .row-fluid
               .span4
-                h4.feature-title Configure and initialize
+                h4.feature-title Define the command structure
+                p The values describes the path to that property in the command message.
 
               .span8
                 .feature
                   pre
                     code
-                      | domain.initialize({
-                      |     commandHandlersPath: __dirname + '/commandHandlers',
-                      |     aggregatesPath: __dirname + '/aggregates',
-                      |     sagaHandlersPath: __dirname + '/sagaHandlers',  // optional, only if using sagas
-                      |     sagasPath: __dirname + '/sagas',                // optional, only if using sagas
-                      |     handleUndispatchedEvents: true,                 // optional
-                      |     disableQueuing: false,                          // optional
-                      |     forcedQueuing: false,                           // optional
-                      |     commandQueue: {                                 // optional
-                      |         type: 'mongodb',                            // example with mongodb
-                      |         dbName: 'domain',
-                      |         collectionName: 'commands',                 // optional
-                      |         host: 'localhost',                          // optional
-                      |         port: 27017,                                // optional
-                      |         username: 'user',                           // optional
-                      |         password: 'pwd',                            // optional
-                      |         timeout: 60 * 1000                          // optional
-                      |     },
-                      |     repository: {                                   // optional
-                      |         type: 'mongodb',                            // example with mongodb
-                      |         dbName: 'domain',
-                      |         collectionName: 'sagas',                    // optional
-                      |         host: 'localhost',                          // optional
-                      |         port: 27017,                                // optional
-                      |         username: 'user',                           // optional
-                      |         password: 'pwd',                            // optional
-                      |         timeout: 60 * 1000                          // optional
-                      |     },
-                      |     eventStore: {                                   // optional
-                      |         type: 'mongodb',                            // example with mongodb
-                      |         dbName: 'domain',
-                      |         eventsCollectionName: 'events',             // optional
-                      |         snapshotsCollectionName: 'snapshots',       // optional
-                      |         host: 'localhost',                          // optional
-                      |         port: 27017,                                // optional
-                      |         username: 'user',                           // optional
-                      |         password: 'pwd',                            // optional
-                      |         timeout: 60 * 1000                          // optional
-                      |     },
-                      |     commandLock: {                                  // optional (used for distributed domain
-                      |                                                     // [handling same aggregate instance on multiple machines])
-                      |         type: 'mongodb',                            // example with mongodb
-                      |         dbName: 'domain',
-                      |         collectionName: 'commandlock',              // optional
-                      |         host: 'localhost',                          // optional
-                      |         port: 27017,                                // optional
-                      |         username: 'user',                           // optional
-                      |         password: 'pwd',                            // optional
-                      |         timeout: 60 * 1000                          // optional
-                      |     },
-                      |     retryOnConcurrencyTimeout: 800                  // optional (used for distributed domain
-                      |                                                     // [handling same aggregate instance on multiple machines])
-                      | }, function(err) {
-                      |     // ready...
+                      | domain.defineCommand({
+                      |   // optional, default is 'id'
+                      |   id: 'id'
+                      |   
+                      |   // optional, default is 'name'
+                      |   name: 'name',
+                      |   
+                      |   // optional, default is 'aggregate.id'
+                      |   // if an aggregate id is not defined in the command, the command handler will create a new aggregate instance
+                      |   aggregateId: 'aggregate.id',
+                      |   
+                      |   // optional, only makes sense if contexts are defined in the 'domainPath' structure 
+                      |   context: 'context.name',
+                      |   
+                      |   // optional, only makes sense if aggregates with names are defined in the 'domainPath' structure
+                      |   aggregate: 'aggregate.name',
+                      |   
+                      |   // optional, but recommended
+                      |   payload: 'payload',
+                      |   
+                      |   // optional, if defined the command handler will check if the command can be handled
+                      |   // if you want the command to be handled in a secure/transactional way pass a revision value that matches the current aggregate revision
+                      |   revision: 'revision',
+                      |   
+                      |   // optional, if defined the command handler will search for a handle that matches command name and version number
+                      |   version: 'version',
+                      |   
+                      |   // optional, if defined theses values will be copied to the event (can be used to transport information like userId, etc..)
+                      |   meta: 'meta'
                       | });
-
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p The validation rules and business rules should be placed parallel to the aggregates folder.
-                    p In this example "__dirname + '/validationRules'" and "__dirname + '/businessRules'"
-                    p The validation rules documentation can be found 
-                      a(href='https://github.com/adrai/rule-validator') here
-                      .
 
             .row-fluid
               .span4
-                h4.feature-title Handle commands
+                h4.feature-title Define the event structure
+                p The values describes the path to that property in the event message.
 
               .span8
                 .feature
                   pre
                     code
-                      | domain.handle({ id: 'msgId', command: 'createDummy', payload: { id: '23445' } }, function(err) {
-                      |     // saved in command queue...
+                      | domain.defineCommand({
+                      |   // optional, default is 'correlationId'
+                      |   // will use the command id as correlationId, so you can match it in the sender 
+                      |   correlationId: 'correlationId',
+                      |   
+                      |   // optional, default is 'id'
+                      |   id: 'id'
+                      |   
+                      |   // optional, default is 'name'
+                      |   name: 'name',
+                      |   
+                      |   // optional, default is 'aggregate.id'
+                      |   aggregateId: 'aggregate.id',
+                      |   
+                      |   // optional, only makes sense if contexts are defined in the 'domainPath' structure 
+                      |   context: 'context.name',
+                      |   
+                      |   // optional, only makes sense if aggregates with names are defined in the 'domainPath' structure
+                      |   aggregate: 'aggregate.name',
+                      |   
+                      |   // optional, default is 'payload'
+                      |   payload: 'payload',
+                      |   
+                      |   // optional, default is 'revision'
+                      |   // will represent the aggregate revision, can be used in next command
+                      |   revision: 'revision',
+                      |   
+                      |   // optional
+                      |   version: 'version',
+                      |   
+                      |   // optional, if defined the values of the command will be copied to the event (can be used to transport information like userId, etc..)
+                      |   meta: 'meta'
                       | });
 
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p The command must have the properties: id, command and payload.
-                    p If you want to check the aggregate revision, the command object needs to have the head property: head: { revision: 1234 }
+            .row-fluid
+              .span4
+                h4.feature-title Define the id generator function [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.idGenerator(function () {
+                      |   var id = require('node-uuid').v4().toString();
+                      |   return id;
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Define the id generator function [optional]
+                p or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.idGenerator(function (callback) {
+                      |   setTimeout(function () {
+                      |     var id = require('node-uuid').v4().toString();
+                      |     callback(null, id);
+                      |   }, 50);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Wire up events [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // pass events to bus
+                      | domain.onEvent(function (evt) {
+                      |   bus.emit('event', evt);
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Wire up events [optional]
+                p or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // pass events to bus
+                      | domain.onEvent(function (evt, callback) {
+                      |   bus.emit('event', evt, function ack () {
+                      |     callback();
+                      |   });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Initialization
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.init(function (err) {
+                      |   // this callback is called when all is ready...
+                      | });
+                      | 
+                      | // or
+                      | 
+                      | domain.init(); // callback is optional
+
+            .row-fluid
+              .span4
+                h4.feature-title Handling a command
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'enterNewPerson',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'person'
+                      |   },
+                      |   context: {
+                      |     name: 'hr'
+                      |   },
+                      |   payload: {
+                      |     firstname: 'Jack',
+                      |     lastname: 'Huston'
+                      |   },
+                      |   revision: 0,
+                      |   version: 1,
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }); // callback is optional
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Handling a command
+                p or
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'renamePerson',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'person'
+                      |   },
+                      |   context: {
+                      |     name: 'hr'
+                      |   },
+                      |   payload: {
+                      |     firstname: 'Jack',
+                      |     lastname: 'Huston'
+                      |   },
+                      |   revision: 0,
+                      |   version: 1,
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }, function (err) {
+                      |   // this callback is called when command is handled successfully or unsuccessfully
+                      |   // err can be of type:
+                      |   // - null
+                      |   // - Error
+                      |   //   {
+                      |   //     name: 'Error',
+                      |   //     message: 'optional message'
+                      |   //   }
+                      |   // - ValidationError
+                      |   //   {
+                      |   //     name: 'ValidationError',
+                      |   //     message: 'some message',
+                      |   //     more: { /* more infos */ }
+                      |   //   }
+                      |   // - BusinessRuleError
+                      |   //   {
+                      |   //     name: 'BusinessRuleError',
+                      |   //     message: 'some message'
+                      |   //   }
+                      |   // - AggregateDestroyedError
+                      |   //   {
+                      |   //     name: 'AggregateDestroyedError',
+                      |   //     message: 'Aggregate has already been destroyed!',
+                      |   //     more: {
+                      |   //       aggregateId: 'ad10d2c0-6509-4cb0-86d2-76312d930001',
+                      |   //       aggregateRevision: 6
+                      |   //     }
+                      |   //   }
+                      |   // - AggregateConcurrencyError
+                      |   //   {
+                      |   //     name: 'AggregateConcurrencyError',
+                      |   //     message: 'Actual revision in command is "3", but expected is "2"!',
+                      |   //     more: {
+                      |   //       aggregateId: 'ad10d2c0-6509-4cb0-86d2-76312d930001',
+                      |   //       aggregateRevision: 2,
+                      |   //       commandRevision: 3
+                      |   //     }
+                      |   //   }
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Handling a command
+                p more infos, can be useful if testing
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'renamePerson',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'person'
+                      |   },
+                      |   context: {
+                      |     name: 'hr'
+                      |   },
+                      |   payload: {
+                      |     firstname: 'Jack',
+                      |     lastname: 'Huston'
+                      |   },
+                      |   revision: 0,
+                      |   version: 1,
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }, function (err, events, aggregateData, metaInfos) {
+                      |   // this callback is called when command is handled successfully or unsuccessfully
+                      |   // err: is the same as described before
+                      |   
+                      |   // events: same as passed in 'onEvent' function
+                      |   // events: in case of no error here is the array of all events that should be published
+                      |   // events: in case of error are the one of these Errors (ValidationError, BusinessRuleError, AggregateDestroyedError, AggregateConcurrencyError)
+                      |   // converted in an event with the event name defined in the options (default is 'commandRejected')
+                      |   
+                      |   // aggregateData: represents the aggregateData after applying the resulting events
+                      |   
+                      |   // metaInfos: { aggregateId: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70', aggregate: 'person', context: 'context' }
+                      | });
+
 
         .row-fluid
           .span12
-            h2 Components
+            h2 Components definition
+
+            .row-fluid
+              .span4
+                h4.feature-title Context
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').defineContext({
+                      |   // optional, default is the directory name
+                      |   name: 'hr'
+                      | });
 
             .row-fluid
               .span4
@@ -169,168 +477,218 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | var base = require('cqrs-domain').aggregateBase;
-                      | 
-                      | module.exports = base.extend({
+                      | module.exports = require('cqrs-domain').defineAggregate({
+                      |   // optional, default is last part of path name
+                      |   name: 'person',
                       |   
-                      |     // snapshotThreshold: 20, 
-                      |     // or
-                      |     // snapshotThreshold: function() { return 12 + 10; },
-                      |   
-                      |     // Commands
-                      |   
-                      |     createDummy: function(data, callback) {
-                      |         this.apply(this.toEvent('dummyCreated', data));
+                      |   // optional, default 0
+                      |   version: 3
+                      | },
                       | 
-                      |         this.checkBusinessRules(callback);
-                      |     },
-                      | 
-                      |     destroyDummy: function(data, callback) {
-                      |         this.apply(this.toEvent('dummyDestroyed', data));
-                      | 
-                      |         this.checkBusinessRules(callback);
-                      |     },
-                      | 
-                      | 
-                      |     // Events
-                      |   
-                      |     dummyCreated: function(data) {
-                      |         this.set(data);
-                      |     },
-                      | 
-                      |     dummyDestroyed: function(data) {
-                      |         this.set('destroyed', true);
-                      |     },
-                      | 
-                      | });
-
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p Save the aggregate in the aggregates folder and name it well. In this example dummyAggregate.js
-                    p In a command function create an event and apply it, when applied optionally you can check the business rules.
-                    p In an event function simply save the event data as you like.
-
-
-            .row-fluid
-              .span4
-                h4.feature-title Business rules
-
-              .span8
-                .feature
-                  pre
-                    code
-                      | module.exports = {
-                      |     dummyAggregate: [
-                      | 
-                      |         function myRule1(changed, previous, events, callback) {
-                      |             if (changed.a < previous.a) {
-                      |                 callback('a must be bigger than a before!');
-                      |             } else {
-                      |                 callback(null);
-                      |             }
-                      |         }
-                      | 
-                      |     ]
-                      | };
-
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p Save the business rules in the business rules folder.
-
-
-            .row-fluid
-              .span4
-                h4.feature-title Command handler
-
-              .span8
-                .feature
-                  pre
-                    code
-                      | var commandHandlerBase = require('cqrs-domain').commandHandlerBase;
-                      | 
-                      | module.exports = commandHandlerBase.extend({
-                      | 
-                      |     aggregate: 'dummyAggregate',
-                      | 
-                      |     commands: ['createDummy', 'destroyDummy', 'fooIt' ],
-                      |
-                      |     fooIt: function(id, cmd) {
-                      |         var self = this;
-                      |         (new this.Command({
-                      |             command: 'createFoo',
-                      |             payload: {
-                      |                 name: 'bla'
-                      |             }
-                      |         })).emit(function(evt) {
-                      |             cmd.payload.fooId = evt.payload.id;
-                      |             self.defaultHandle(id, cmd);
-                      |         });
-                      |     }
-                      | 
-                      | });
-
-                  .alert.alert-info.feature-description
-                    h6 Important hint:
-                    p Save the command handler in the command handlers folder and name it well. In this example dummyCommandHandler.js
-                    p If you define own handler functions you can do special things like emitting an other command.
-
-        .row-fluid
-          .span12
-            h2 Settings for a scalable solution
-
-            .row-fluid
-              .span4
-                h4.feature-title Settings
-
-              .span8
-                .feature
-                  pre
-                    code
+                      | // optionally, define some initialization data...
                       | {
-                      |   commandHandlersPath: __dirname + '/commandHandlers',
-                      |   aggregatesPath: __dirname + '/aggregates',
-                      |   sagaHandlersPath: __dirname + '/sagaHandlers',
-                      |   sagasPath: __dirname + '/sagas',
-                      |   handleUndispatchedEvents: false,
-                      |   disableQueuing: false,
-                      |   forcedQueuing: false,
-                      |   commandQueue: {
-                      |       type: 'inMemory',
-                      |       collectionName: 'commands'
-                      |   },
-                      |   repository: {
-                      |       type: 'mongodb',
-                      |       dbName: 'domain',
-                      |       collectionName: 'sagas',
-                      |       host: 'localhost',
-                      |       port: 27017,
-                      |       username: 'user',
-                      |       password: 'pwd',
-                      |       timeout: 60 * 1000
-                      |   },
-                      |   eventStore: {
-                      |       type: 'mongodb',
-                      |       dbName: 'domain',
-                      |       eventsCollectionName: 'events',
-                      |       snapshotsCollectionName: 'snapshots',
-                      |       host: 'localhost',
-                      |       port: 27017,
-                      |       username: 'user',
-                      |       password: 'pwd',
-                      |       timeout: 60 * 1000
-                      |   },
-                      |   commandLock: {
-                      |       type: 'mongodb',
-                      |       dbName: 'domain',
-                      |       collectionName: 'commandlock',
-                      |       host: 'localhost',
-                      |       port: 27017,
-                      |       username: 'user',
-                      |       password: 'pwd',
-                      |       timeout: 60 * 1000
-                      |   },
-                      |   retryOnConcurrencyTimeout: 800
-                      | }
+                      |   emails: ['default@mycomp.org'],
+                      |   phoneNumbers: []
+                      | })
+                      | 
+                      | // optionally, define snapshot need algorithm...
+                      | .defineSnapshotNeed(function (loadingTime, events, aggregateData) {
+                      |   // loadingTime is the loading time in ms of the eventstore data
+                      |   // events are all loaded events in an array
+                      |   // aggregateData represents the aggregateData after applying the resulting events
+                      |   return events.length >= 200;
+                      | })
+                      | 
+                      | // optionally, define conversion algorithm for older snapshots
+                      | // always convert directly to newest version...
+                      | // when loaded a snapshot and it's an older snapshot, a new snapshot with same revision but with newer aggregate version will be created
+                      | .defineSnapshotConversion({
+                      |   version: 1
+                      | }, function (data, aggregate) {
+                      |   // data is the snapshot data
+                      |   // aggregate is the aggregate object
+                      |   
+                      |   aggregate.set('emails', data.emails);
+                      |   aggregate.set('phoneNumbers', data.phoneNumbers);
+                      | 
+                      |   var names = data.name.split(' ');
+                      |   aggregate.set('firstname', names[0]);
+                      |   aggregate.set('lastname', names[1]);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Command validation
+
+              .span8
+                .feature
+                  p
+                    | All command schemas are json schemas. Hint 
+                    a(href='http://jsonary.com/documentation/json-schema/') http://jsonary.com/documentation/json-schema/
+                  p
+                    | Internally the 
+                    a(href='http://geraintluff.github.io/tv4/') tv4
+                    |  module is used for validation.
+                  p
+                    | Each command schema title should match the command name. Example: 
+                    a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/validationRules/enterNewPerson.json') enterNewPerson.json
+                  p
+                    | To support mutliple verstion loo at: 
+                    a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/validationRules/unregisterAllContactInformation.json#L10') unregisterAllContactInformation.json
+                  p You can also have an hierarchical command extension look at: 
+                  ul
+                    li
+                      a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/validationRules/enterNewPerson.json') command
+                    li
+                      a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/command.json') aggregate
+                    li
+                      a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/command.json') context
+                    li
+                      a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/command.json') general
+
+            .row-fluid
+              .span4
+                h4.feature-title Command
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').defineCommand({
+                      |   // optional, default is file name without extension
+                      |   name: 'enterNewPerson',
+                      |   
+                      |   // optional, default 0
+                      |   version: 1,
+                      |   
+                      |   // optional, if not defined it will pass the whole command...
+                      |   payload: 'payload'
+                      | }, function (data, aggregate) {
+                      |   // data is the command data
+                      |   // aggregate is the aggregate object
+                      |   
+                      |   // if (aggregate.get('someAttr') === 'someValue' && aggregate.has('special')) { ... }
+                      |   
+                      |   aggregate.apply('enteredNewPerson', data);
+                      |   // or
+                      |   // aggregate.apply({
+                      |   //   event: 'enteredNewPerson',
+                      |   //   payload: data
+                      |   // });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Event
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').defineEvent({
+                      |   // optional, default is file name without extension
+                      |   name: 'enteredNewPerson',
+                      |   
+                      |   // optional, default 0
+                      |   version: 3,
+                      |   
+                      |   // optional, if not defined it will pass the whole event...
+                      |   payload: 'payload'
+                      | }, function (data, aggregate) {
+                      |   // data is the event data
+                      |   // aggregate is the aggregate object
+                      |   
+                      |   aggregate.set('firstname', data.firstname);
+                      |   aggregate.set('lastname', data.lastname);
+                      |   aggregate.get('emails').push(data.email);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Business Rule
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').defineBusinessRule({
+                      |   // optional, default is file name without extension
+                      |   name: 'nameEquality',
+                      |   
+                      |   // optional
+                      |   description: 'firstname should never be equal lastname',
+                      |   
+                      |   // optional, default Infinity, all business rules will be sorted by this value
+                      |   priority: 1
+                      | }, function (changed, previous, events, command, callback) {
+                      |   // changed is the new aggregate object
+                      |   // previous is the old aggregate object
+                      |   // events is the array with the resulting events
+                      |   // command the handling command
+                      |   // callback is optional, if not defined as function argument you can throw errors or return errors here (sync way) 
+                      | 
+                      |   if (changed.get('firstname') === changed.get('lastname')) {
+                      |     return callback('names not valid');
+                      |     // or
+                      |     // return callback(new Error('names not valid'));
+                      |     // or
+                      |     // return callback(new Error()); // if no error message is defined then the description will be taken
+                      |   }
+                      |   callback(null);
+                      |   
+                      |   // or if callback is not defined as function argument
+                      |   // if (changed.get('firstname') === changed.get('lastname')) {
+                      |   //   return 'names not valid';
+                      |   //   // or
+                      |   //   // return new Error('names not valid');
+                      |   //   // or
+                      |   //   // return new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error('names not valid');
+                      |   // }
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Command Handler (Be careful!!!)
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').defineCommandHandler({
+                      |   // optional, default is file name without extension
+                      |   name: 'enterNewSpecialPerson',
+                      |   
+                      |   // optional, default 0
+                      |   version: 1,
+                      |   
+                      |   // optional, if not defined it will pass the whole command...
+                      |   payload: 'payload'
+                      | }, function (cmd, commandHandler, callback) {
+                      |   // cmd is the command data
+                      | 
+                      |   // if cmd was sent without aggregateId, now in cmd there is a generated aggregateId...
+                      |   
+                      |   commandHandler.loadAggregate(cmd.aggregate.id, function (err, aggregate, stream) {
+                      |     if (err) {
+                      |       return callback(err);
+                      |     }
+                      |     
+                      |     callback(null, [{ my: 'special', ev: 'ent' }]);
+                      | 
+                      | //    // check if destroyed, check revision, validate command
+                      | //    var err = commandHandler.verifyAggregate(aggregate, cmd);
+                      | //    if (err) {
+                      | //      return callback(err);
+                      | //    }
+                      | //
+                      | //    // call api or emit a command or whatever...
+                      | //    // and at the end perhaps you call: commandHandler.handle(cmd, callback);
+                      |   });
+                      | });
 
     include ../includes/layout/extra
       
