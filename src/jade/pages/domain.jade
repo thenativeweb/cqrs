@@ -62,8 +62,8 @@ html(lang="en")
                       | var domain = require('cqrs-domain')({
                       |   // the path to the "working directory"
                       |   // can be structured like
-                      |   // [set 1](https://github.com/adrai/node-cqrs-domain/tree/1.0/test/integration/fixture/set1) or
-                      |   // [set 2](https://github.com/adrai/node-cqrs-domain/tree/1.0/test/integration/fixture/set2)
+                      |   // [set 1](https://github.com/adrai/node-cqrs-domain/tree/master/test/integration/fixture/set1) or
+                      |   // [set 2](https://github.com/adrai/node-cqrs-domain/tree/master/test/integration/fixture/set2)
                       |   domainPath: '/path/to/my/files',
                       |   
                       |   // optional, default is 'commandRejected'
@@ -163,7 +163,7 @@ html(lang="en")
                     code
                       | domain.defineCommand({
                       |   // optional, default is 'id'
-                      |   id: 'id'
+                      |   id: 'id',
                       |   
                       |   // optional, default is 'name'
                       |   name: 'name',
@@ -201,13 +201,13 @@ html(lang="en")
                 .feature
                   pre
                     code
-                      | domain.defineCommand({
+                      | domain.defineEvent({
                       |   // optional, default is 'correlationId'
                       |   // will use the command id as correlationId, so you can match it in the sender 
                       |   correlationId: 'correlationId',
                       |   
                       |   // optional, default is 'id'
-                      |   id: 'id'
+                      |   id: 'id',
                       |   
                       |   // optional, default is 'name'
                       |   name: 'name',
