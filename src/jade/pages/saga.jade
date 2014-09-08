@@ -1,0 +1,535 @@
+- var path = '../'
+- var title = 'cqrs - saga'
+!!! 5
+html(lang="en")
+  head
+    include ../includes/layout/head
+
+  body
+    include ../includes/layout/header
+          
+    include ../includes/layout/content
+      .documentation
+        .row-fluid
+          .span8
+            .hero-unit
+              h2 
+                | cqrs-saga
+                //- small  - translation made easy
+              p cqrs-saga is a node.js module that helps to implement the sagas in cqrs. It can be very useful as domain component if you work with (d)ddd, cqrs, eventdenormalizer, host, etc.
+
+          .span4.downloads
+            p node.js:
+            pre
+              code
+                | npm install cqrs-saga
+
+            p
+              | Build status: 
+              a(href='http://travis-ci.org/adrai/node-cqrs-saga')
+                img(src='https://secure.travis-ci.org/adrai/node-cqrs-saga.png')
+
+            p
+              | Release: 
+              a(href='https://npmjs.org/package/cqrs-saga')
+                img(src='https://img.shields.io/npm/v/cqrs-saga.svg')
+
+            .alert.alert-info.feature-description(style='margin-top: 25px;')
+                a(href='https://github.com/adrai/node-cqrs-saga')
+                  i.icon-github
+                  |  fork me on github
+                br
+                a(href='https://github.com/adrai/node-cqrs-saga/issues')
+                  i.icon-github
+                  |  issues
+                br
+                a(href='https://github.com/adrai/node-cqrs-saga/blob/master/releasenotes.md')
+                  i.icon-github
+                  |  release notes
+
+        .row-fluid
+          .span12
+            h2 Usage
+
+            .row-fluid
+              .span4
+                h4.feature-title Configure
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var pm = require('cqrs-saga')({
+                      |   // the path to the "working directory"
+                      |   // can be structured like
+                      |   // [set 1](https://github.com/adrai/node-cqrs-saga/tree/master/test/integration/fixture)
+                      |   sagaPath: '/path/to/my/files',
+                      |   
+                      |   // optional, default is 800
+                      |   // if using in scaled systems and not guaranteeing that each event for a saga "instance"
+                      |   // dispatches to the same worker process, this module tries to catch the concurrency issues and
+                      |   // retries to handle the event after a timeout between 0 and the defined value
+                      |   retryOnConcurrencyTimeout: 1000,
+                      |   
+                      |   // optional, default is in-memory
+                      |   // currently supports: mongodb, redis and inmemory
+                      |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
+                      |   // mongodb:
+                      |   sagaStore: {
+                      |     type: 'mongodb',
+                      |     host: 'localhost',                          // optional
+                      |     port: 27017,                                // optional
+                      |     dbName: 'domain',                           // optional
+                      |     collectionName: 'sagas',                    // optional
+                      |     timeout: 10000                              // optional
+                      |     // username: 'technicalDbUser',                // optional
+                      |     // password: 'secret'                          // optional
+                      |   },
+                      |   // or redis:
+                      |   sagaStore: {
+                      |     type: 'redis',
+                      |     host: 'localhost',                          // optional
+                      |     port: 6379,                                 // optional
+                      |     db: 0,                                      // optional
+                      |     prefix: 'domain_saga',                      // optional
+                      |     timeout: 10000                              // optional
+                      |     // password: 'secret'                          // optional
+                      |   }
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Catch connect ad disconnect events
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // sagaStore
+                      | domain.sagaStore.on('connect', function() {
+                      |   console.log('sagaStore connected');
+                      | });
+                      | 
+                      | domain.sagaStore.on('disconnect', function() {
+                      |   console.log('sagaStore disconnected');
+                      | });
+                      | 
+                      | 
+                      | // anything (at the moment only sagaStore)
+                      | domain.on('connect', function() {
+                      |   console.log('something connected');
+                      | });
+                      | 
+                      | domain.on('disconnect', function() {
+                      |   console.log('something disconnected');
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p For example in a cloud environment the disconnect event could be used to kill the process.
+
+            .row-fluid
+              .span4
+                h4.feature-title Define the event structure
+                p The values describes the path to that property in the event message.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.defineEvent({
+                      |   // optional, default is 'name'
+                      |   name: 'name',
+                      |   
+                      |   // optional, only makes sense if contexts are defined in the 'domainPath' structure 
+                      |   context: 'context.name',
+                      |   
+                      |   // optional, only makes sense if aggregates with names are defined in the 'domainPath' structure
+                      |   aggregate: 'aggregate.name',
+                      |   
+                      |   // optional
+                      |   version: 'version',
+                      |   
+                      |   // optional, if defined theses values will be copied to the command (can be used to transport information like userId, etc..)
+                      |   meta: 'meta'
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Define the command structure
+                p The values describes the path to that property in the command message.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.defineCommand({
+                      |   // optional, default is 'id'
+                      |   id: 'id',
+                      |   
+                      |   // optional, if defined the values of the event will be copied to the command (can be used to transport information like userId, etc..)
+                      |   meta: 'meta'
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Define the id generator function [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.idGenerator(function () {
+                      |   var id = require('node-uuid').v4().toString();
+                      |   return id;
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Define the id generator function [optional]
+                p or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.idGenerator(function (callback) {
+                      |   setTimeout(function () {
+                      |     var id = require('node-uuid').v4().toString();
+                      |     callback(null, id);
+                      |   }, 50);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Wire up commands [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // pass commands to bus
+                      | pm.onCommand(function (cmd) {
+                      |   bus.emit('command', cmd);
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Wire up events [optional]
+                p or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | // pass commands to bus
+                      | pm.onCommand(function (cmd, callback) {
+                      |   bus.emit('command', cmd, function ack () {
+                      |     callback();
+                      |   });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Initialization
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.init(function (err) {
+                      |   // this callback is called when all is ready...
+                      | });
+                      | 
+                      | // or
+                      | 
+                      | pm.init(); // callback is optional
+
+            .row-fluid
+              .span4
+                h4.feature-title Handling an event
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'orderCreated',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'order'
+                      |   },
+                      |   context: {
+                      |     name: 'sale'
+                      |   },
+                      |   payload: {
+                      |     totalCosts: 520,
+                      |     seats: ['4f', '8a']
+                      |   },
+                      |   revision: 0,
+                      |   version: 1,
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }); // callback is optional
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Handling an event
+                p or
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'orderCreated',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'order'
+                      |   },
+                      |   context: {
+                      |     name: 'sale'
+                      |   },
+                      |   payload: {
+                      |     totalCosts: 520,
+                      |     seats: ['4f', '8a']
+                      |   },
+                      |   revision: 0,
+                      |   version: 1,
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }, function (errs, cmds) {
+                      |   // this callback is called when event is handled successfully or unsuccessfully
+                      |   // errs can be of type:
+                      |   // - null
+                      |   // - Array of Errors
+                      |   //
+                      |   // cmds: same as passed in 'onCommand' function
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Handling an event
+                p more infos, can be useful if testing
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.handle({
+                      |   id: 'b80ade36-dd05-4340-8a8b-846eea6e286f',
+                      |   name: 'orderCreated',
+                      |   aggregate: {
+                      |     id: '3b4d44b0-34fb-4ceb-b212-68fe7a7c2f70',
+                      |     name: 'order'
+                      |   },
+                      |   context: {
+                      |     name: 'sale'
+                      |   },
+                      |   payload: {
+                      |     totalCosts: 520,
+                      |     seats: ['4f', '8a']
+                      |   },
+                      |   meta: {
+                      |     userId: 'ccd65819-4da4-4df9-9f24-5b10bf89ef89'
+                      |   }
+                      | }, function (errs, cmds, sagaModels) {
+                      |   // this callback is called when event is handled successfully or unsuccessfully
+                      |   // errs: is the same as described before
+                      |   
+                      |   // cmds: same as passed in 'onCommand' function
+                      |   // cmds: in case of no error or in case of error here is the array of all commands that should be published
+                      |   
+                      |   // sagaModels: represents the saga data after have handled the event
+                      | });
+
+
+        .row-fluid
+          .span12
+            h2 Components definition
+
+            .row-fluid
+              .span4
+                h4.feature-title Saga
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-saga').defineSaga({
+                      |   // optional, default is file name without extension
+                      |   name: 'orderCreated',
+                      |   
+                      |   // optional
+                      |   aggregate: 'order',
+                      |   
+                      |   // optional
+                      |   context: 'sale',
+                      |   
+                      |   // optional, default 0
+                      |   version: 1,
+                      |   
+                      |   // optional, default false
+                      |   // if true it will check if there is already a saga in the db and only if there is something it will continue...
+                      |   existing: false,
+                      |   
+                      |   // optional, will catch the event only if it contains the defined properties
+                      |   containingProperties: ['aggregate.id', 'payload.totalCosts', 'payload.seats'],
+                      |   
+                      |   // optional, if not defined it will pass the whole event...
+                      |   payload: 'payload',
+                      |   
+                      |   // optional, if not defined it will generate a new id
+                      |   // it will try to load the saga from the db by this id
+                      |   id: 'aggregate.id',
+                      |   
+                      |   // optional, default Infinity, all sagas will be sorted by this value
+                      |   priority: 1
+                      | }, function (evt, saga, callback) {
+                      | 
+                      |   saga.set('orderId', evt.aggregate.id);
+                      |   saga.set('totalCosts', evt.payload.totalCosts);
+                      |   // or
+                      |   // saga.set({ orderId: evt.aggregate.id, totalCosts: evt.payload.totalCosts });
+                      | 
+                      |   var cmd = {
+                      |   
+                      |     // if you don't pass an id it will generate a new one
+                      |     id: 'my own command id',
+                      |     name: 'makeReservation',
+                      |     aggregate: {
+                      |       name: 'reservation'
+                      |     },
+                      |     context: {
+                      |       name: 'sale'
+                      |     },
+                      |     payload: {
+                      |       transactionId: saga.id,
+                      |       seats: saga.has('seats') ? saga.get('seats') : evt.payload.seats
+                      |     },
+                      |     
+                      |     // to transport meta infos (like userId)...
+                      |     // if not defined, it will use the meta value of the event
+                      |     meta: evt.meta
+                      |   };
+                      | 
+                      |   saga.addCommandToSend(cmd);
+                      | 
+                      |   // optionally define a timeout
+                      |   // this can be useful if you have an other process that will fetch timeouted sagas
+                      |   var tomorrow = new Date();
+                      |   tomorrow.setDate((new Date()).getDate() + 1); 
+                      |   var timeoutCmd = {
+                      |   
+                      |     // if you don't pass an id it will generate a new one
+                      |     id: 'my own command id',
+                      |     name: 'cancelOrder',
+                      |     aggregate: {
+                      |       name: 'order',
+                      |       id: evt.aggregate.id
+                      |     },
+                      |     context: {
+                      |       name: 'sale'
+                      |     },
+                      |     payload: {
+                      |       transactionId: saga.id
+                      |     },
+                      |     
+                      |     // to transport meta infos (like userId)...
+                      |     // if not defined, it will use the meta value of the event
+                      |     meta: evt.meta
+                      |   };
+                      |   saga.defineTimeout(tomorrow, [timeoutCmd]);
+                      |   // or
+                      |   // saga.defineTimeout(tomorrow, timeoutCmd);
+                      |   // or
+                      |   // saga.defineTimeout(tomorrow);
+                      | 
+                      |   saga.commit(callback);
+                      | });
+
+        .row-fluid
+          .span12
+            h2 Persistence functions
+
+            .row-fluid
+              .span4
+                h4.feature-title getTimoutedSagas
+                p Use this function to get all timeouted sagas.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.getTimeoutedSagas(function (err, sagas) {
+                      |   if (err) { return console.log('ohh!'); }
+                      |   
+                      |   sagas.forEach(function (saga) {
+                      |     // saga.id...
+                      |     // saga.getTimeoutAt();
+                      |     // saga.getTimeoutCommands();
+                      |     
+                      |     // if saga does not clean itself after timouted and/or no commands are defined, then:
+                      |     pm.removeSaga(saga || saga.id, function (err) {});
+                      |     // or
+                      |     // saga.destroy();
+                      |     // saga.commit(function (err) {});
+                      |   });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title getOlderSagas
+                p Use this function to get all sagas that are older then the passed date.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.getOlderSagas(new Date(2010, 2, 4), function (err, sagas) {
+                      |   if (err) { return console.log('ohh!'); }
+                      |   
+                      |   sagas.forEach(function (saga) {
+                      |     // saga.id...
+                      |     // saga.getTimeoutAt();
+                      |     // saga.getTimeoutCommands();
+                      |     
+                      |     // if saga does not clean itself after timouted and/or no commands are defined, then:
+                      |     pm.removeSaga(saga || saga.id, function (err) {});
+                      |     // or
+                      |     // saga.destroy();
+                      |     // saga.commit(function (err) {});
+                      |   });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title getUndispatchedCommands | setCommandToDispatched
+                p Use getUndispatchedCommands to get all undispatched commands.
+                p Use setCommandToDispatched to mark a command as dispatched. (will remove it from the db)
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.getUndispatchedCommands(function (err, cmds) {
+                      |   if (err) { return console.log('ohh!'); }
+                      |   
+                      |   cmds.forEach(function (cmd) {
+                      |     // cmd is: { sagaId: 'the id of the saga', commandId: 'the id of the command', command: { /* the command */ } }
+                      |     
+                      |     pm.setCommandToDispatched(cmd.commandId, cmd.sagaId, function (err) {});
+                      |   });
+                      | });
+
+    include ../includes/layout/extra
+      
+    include ../includes/layout/footer
+    
+    include ../includes/layout/endscripts
