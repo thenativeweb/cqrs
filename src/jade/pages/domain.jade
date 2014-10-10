@@ -488,7 +488,10 @@ html(lang="en")
                       |   defaultCommandPayload: 'payload',
                       |   
                       |   // optional, default ''
-                      |   defaultEventPayload: 'payload'
+                      |   defaultEventPayload: 'payload',
+                      |            
+                      |   // optional, default ''
+                      |   defaultPreConditionPayload: 'payload'
                       | },
                       | 
                       | // optionally, define some initialization data...
@@ -558,7 +561,59 @@ html(lang="en")
 
             .row-fluid
               .span4
+                h4.feature-title Pre-Condition
+                p Can be used to perform some business rules before handling the command.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | module.exports = require('cqrs-domain').definePreCondition({
+                      |   // optional, default is file name without extension
+                      |   name: 'unregisterAllContactInformation',
+                      |   
+                      |   // optional, default 0
+                      |   version: 2,
+                      |   
+                      |   // optional, if not defined it will use what is defined as default in aggregate or pass the whole command
+                      |   payload: 'payload'
+                      |   
+                      |   // optional
+                      |   description: 'firstname should always be set'
+                      | }, function (data, aggregate, callback) {
+                      |   // data is the command data
+                      |   // aggregate is the aggregate object
+                      |   // callback is optional, if not defined as function argument you can throw errors or return errors here (sync way) 
+                      | 
+                      |   if (!agg.has('firstname')) {
+                      |     return callback('not personalized');
+                      |     // or
+                      |     // return callback(new Error('not personalized'));
+                      |     // or
+                      |     // return callback(new Error()); // if no error message is defined then the description will be taken
+                      |   }
+                      |   callback(null);
+                      |   
+                      |   // or if callback is not defined as function argument
+                      |   // if (!agg.has('firstname')) {
+                      |   //   return 'not personalized';
+                      |   //   // or
+                      |   //   // return new Error('not personalized');
+                      |   //   // or
+                      |   //   // return new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error('not personalized');
+                      |   // }
+                      | });
+
+            .row-fluid
+              .span4
                 h4.feature-title Command
+                p Collect all needed infos from aggregate to generate your event(s).
+                p Move checks out of here, the correct places are "business rules" or "pre-conditions"!
+                p Do NOT manipulate the aggregate here!
 
               .span8
                 .feature
@@ -590,6 +645,7 @@ html(lang="en")
             .row-fluid
               .span4
                 h4.feature-title Event
+                p This is the place where you should manipulate your aggregate.
 
               .span8
                 .feature
