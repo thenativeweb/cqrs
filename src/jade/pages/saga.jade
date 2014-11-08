@@ -123,11 +123,11 @@ html(lang="en")
                   pre
                     code
                       | // sagaStore
-                      | domain.sagaStore.on('connect', function() {
+                      | pm.sagaStore.on('connect', function() {
                       |   console.log('sagaStore connected');
                       | });
                       | 
-                      | domain.sagaStore.on('disconnect', function() {
+                      | pm.sagaStore.on('disconnect', function() {
                       |   console.log('sagaStore disconnected');
                       | });
                       | 
@@ -142,11 +142,11 @@ html(lang="en")
                       | 
                       | 
                       | // anything (sagaStore or revisionGuardStore)
-                      | domain.on('connect', function() {
+                      | pm.on('connect', function() {
                       |   console.log('something connected');
                       | });
                       | 
-                      | domain.on('disconnect', function() {
+                      | pm.on('disconnect', function() {
                       |   console.log('something disconnected');
                       | });
 
