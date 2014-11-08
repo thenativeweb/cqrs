@@ -94,6 +94,23 @@ html(lang="en")
                       |     prefix: 'domain_saga',                      // optional
                       |     timeout: 10000                              // optional
                       |     // password: 'secret'                          // optional
+                      |   },
+                      |           
+                      |   // optional, default is in-memory
+                      |   // the revisionguard only works if aggregateId and revision are defined in event definition
+                      |   // currently supports: mongodb, redis, tingodb and inmemory
+                      |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
+                      |   revisionGuard: {
+                      |     queueTimeout: 1000,                         // optional, | timeout for non-handled events in the internal in-memory queue
+                      |     queueTimeoutMaxLoops: 3                     // optional, | maximal loop count for non-handled event in the internal in-| memory queue
+                      |     
+                      |     type: 'redis',
+                      |     host: 'localhost',                          // optional
+                      |     port: 6379,                                 // optional
+                      |     db: 0,                                      // optional
+                      |     prefix: 'readmodel_revision',               // optional
+                      |     timeout: 10000                              // optional
+                      |     // password: 'secret'                          // optional
                       |   }
                       | });
 
@@ -114,8 +131,17 @@ html(lang="en")
                       |   console.log('sagaStore disconnected');
                       | });
                       | 
+                      | // revisionGuardStore
+                      | pm.revisionGuardStore.on('connect', function() {
+                      |   console.log('revisionGuardStore connected');
+                      | });
                       | 
-                      | // anything (at the moment only sagaStore)
+                      | pm.revisionGuardStore.on('disconnect', function() {
+                      |   console.log('revisionGuardStore disconnected');
+                      | });
+                      | 
+                      | 
+                      | // anything (sagaStore or revisionGuardStore)
                       | domain.on('connect', function() {
                       |   console.log('something connected');
                       | });
@@ -146,6 +172,13 @@ html(lang="en")
                       |   
                       |   // optional, only makes sense if aggregates with names are defined in the 'domainPath' structure
                       |   aggregate: 'aggregate.name',
+                      |   
+                      |   // optional, default is 'aggregate.id'
+                      |   aggregateId: 'aggregate.id',
+                      |   
+                      |   // optional, default is 'revision'
+                      |   // will represent the aggregate revision, can be used in next command
+                      |   revision: 'revision',
                       |   
                       |   // optional
                       |   version: 'version',
@@ -217,7 +250,7 @@ html(lang="en")
 
             .row-fluid
               .span4
-                //- h4.feature-title Wire up events [optional]
+                //- h4.feature-title Wire up commands [optional]
                 p or you can define an asynchronous function
 
               .span8
@@ -229,6 +262,30 @@ html(lang="en")
                       |   bus.emit('command', cmd, function ack () {
                       |     callback();
                       |   });
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Wire up missing events [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.onEventMissing(function (info, evt) {
+                      | 
+                      |   // grab the missing events, depending from info values...
+                      |   // info.aggregateId
+                      |   // info.aggregateRevision
+                      |   // info.aggregate
+                      |   // info.context
+                      |   // info.guardRevision
+                      |   // and call handle...
+                      |   pm.handle(missingEvent, function (err) {
+                      |     if (err) { console.log(err); }
+                      |   });
+                      |   
                       | });
 
             .row-fluid
