@@ -572,6 +572,7 @@ html(lang="en")
                       | module.exports = require('cqrs-domain').definePreCondition({
                       |   // the command name
                       |   // optional, default is file name without extension
+                      |   // if name is '' it will handle all commands that matches the appropriate aggregate
                       |   name: 'unregisterAllContactInformation',
                       |   
                       |   // optional, default 0
