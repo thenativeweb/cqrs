@@ -72,7 +72,7 @@ html(lang="en")
                       |   retryOnConcurrencyTimeout: 1000,
                       |   
                       |   // optional, default is in-memory
-                      |   // currently supports: mongodb, redis and inmemory
+                      |   // currently supports: mongodb, redis, azuretable and inmemory
                       |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
                       |   // mongodb:
                       |   sagaStore: {
@@ -98,7 +98,7 @@ html(lang="en")
                       |           
                       |   // optional, default is in-memory
                       |   // the revisionguard only works if aggregateId and revision are defined in event definition
-                      |   // currently supports: mongodb, redis, tingodb and inmemory
+                      |   // currently supports: mongodb, redis, tingodb, azuretable and inmemory
                       |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
                       |   revisionGuard: {
                       |     queueTimeout: 1000,                         // optional, | timeout for non-handled events in the internal in-memory queue
