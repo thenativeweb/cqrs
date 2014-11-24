@@ -586,10 +586,6 @@ html(lang="en")
                       |   
                       |   // optional, default Infinity, all pre-conditions will be sorted by this value
                       |   priority: 1,
-                      | 
-                      |   // optional, default false
-                      |   // if true, ensures the aggregate to exists already before this command was handled
-                      |   existing: true
                       | }, function (data, aggregate, callback) {
                       |   // data is the command data
                       |   // aggregate is the aggregate object
@@ -638,6 +634,11 @@ html(lang="en")
                       |   
                       |   // optional, if not defined it will use what is defined as default in aggregate or pass the whole command
                       |   payload: 'payload'
+                      | 
+                      |   // optional, default undefined
+                      |   // if true, ensures the aggregate to exists already before this command was handled
+                      |   // if false, ensures the aggregate to not exists already before this command was handledthis command was handled
+                      |   existing: true
                       | }, function (data, aggregate) {
                       |   // data is the command data
                       |   // aggregate is the aggregate object
