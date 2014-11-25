@@ -539,9 +539,17 @@ html(lang="en")
                     a(href='http://geraintluff.github.io/tv4/') tv4
                     |  module is used for validation.
                   p
-                    | Additionaly the plugin 
+                    | Additionaly you can extend the tv4 instance with other functionality like 
                     a(href='https://github.com/ikr/tv4-formats') tv4-formats
-                    |  is integrated, so you can easily use format constraints (i.e. 'email') for your 'string'-types.
+                    | , so you can easily use format constraints (i.e. 'email') for your 'string'-types.
+                  p
+                    | To extend tv4 just catch the tv4 instance after having initialized the domain:
+                    pre
+                      code
+                        | domain.init(function (err) {
+                        |   domain.tv4.addFormat(require('tv4-formats'));
+                        | });
+                    
                   p
                     | Each command schema title should match the command name. Example: 
                     a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/validationRules/enterNewPerson.json') enterNewPerson.json
