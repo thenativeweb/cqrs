@@ -49,6 +49,59 @@ html(lang="en")
 
         .row-fluid
           .span12
+            h2 Workflow
+
+            .row-fluid
+              .span12
+                .feature
+                  pre
+                    code
+                      |         │
+                      |        cmd
+                      |         │
+                      |         ∨
+                      |   ╔════════════╗
+                      |   ║ validation ║─────────> "rejected"
+                      |   ╚════════════╝
+                      |         │
+                      |        cmd
+                      |         │
+                      |         ∨
+                      | ╔════════════════╗
+                      | ║ pre-conditions ║─────> "rejected"
+                      | ╚════════════════╝
+                      |         │
+                      |        cmd
+                      |         │
+                      |         ∨
+                      |   ╔════════════╗
+                      |   ║ handle cmd ║
+                      |   ╚════════════╝
+                      |         │
+                      |        evt
+                      |         │
+                      |         ∨
+                      |   ╔═══════════╗
+                      |   ║ apply evt ║
+                      |   ╚═══════════╝
+                      |         │
+                      |         │
+                      |         │
+                      |         ∨
+                      | ╔════════════════╗
+                      | ║ business rules ║─────> "rejected"
+                      | ╚════════════════╝
+                      |         │
+                      |         │
+                      |         │
+                      |         ∨
+                      |    ╔════════╗
+                      |    ║ commit ║
+                      |    ╚════════╝
+
+
+        .row-fluid
+          .span12
             h2 Usage
 
             .row-fluid
