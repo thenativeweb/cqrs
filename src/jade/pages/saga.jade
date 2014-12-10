@@ -538,10 +538,23 @@ html(lang="en")
                       |   sagas.forEach(function (saga) {
                       |     // saga.id...
                       |     // saga.getTimeoutAt();
-                      |     // saga.getTimeoutCommands();
-                      |     
-                      |     // if saga does not clean itself after timouted and/or no commands are defined, then:
-                      |     pm.removeSaga(saga || saga.id, function (err) {});
+                      |     var cmds = saga.getTimeoutCommands();
+                      | 
+                      |     cmds.forEach(function (cmd) {
+                      |         saga.addCommandToSend(cmd);
+                      |     });
+                      | 
+                      |     saga.commit(function (err) {
+                      |         cmds.forEach(function (cmd) {
+                      |             // publish cmd...
+                      |             // msgBus.send(cmd);
+                      |             // ... and set to dispatched...
+                      |             pm.setCommandToDispatched(cmd.id, saga.id, function (err) {});
+                      |         });
+                      |     });
+                      | 
+                      |     // or if saga does not clean itself after timouted and/or no commands are defined, then:
+                      |     // pm.removeSaga(saga || saga.id, function (err) {});
                       |     // or
                       |     // saga.destroy();
                       |     // saga.commit(function (err) {});
@@ -587,7 +600,7 @@ html(lang="en")
                       |   if (err) { return console.log('ohh!'); }
                       |   
                       |   cmds.forEach(function (cmd) {
-                      |     // cmd is: { sagaId: 'the id of the saga', commandId: 'the id of the command', command: { /* the command */ } }
+                      |     // cmd is: { sagaId: 'the id of the saga', commandId: 'the id of the command', commitStamp: 'a date', command: { /* the command */ } }
                       |     
                       |     pm.setCommandToDispatched(cmd.commandId, cmd.sagaId, function (err) {});
                       |   });
