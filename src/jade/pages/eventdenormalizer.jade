@@ -492,6 +492,15 @@ html(lang="en")
                       |   phoneNumbers: []
                       | });
 
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p If you need an information from an other collection while denormalizing an event, you can require such a collection and make some lookups.
+                    p for example:
+                    pre
+                      code
+                        | col.find({ my: 'value' }, function (err, vms) {});
+                    p But be careful with this!
+
             .row-fluid
               .span4
                 h4.feature-title ViewBuilder
@@ -561,6 +570,11 @@ html(lang="en")
                       | //.useAsQuery(function (evt) {
                       | //  return { my: evt.payload.my };
                       | //});
+                      | // or async
+                      | //.useAsQuery(function (evt, callback) {
+                      | //  callback(null, { my: evt.payload.my });
+                      | //});
+
 
             .row-fluid
               .span4
