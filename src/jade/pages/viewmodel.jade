@@ -7,16 +7,16 @@ html(lang="en")
 
   body
     include ../includes/layout/header
-          
+
     include ../includes/layout/content
       .documentation
         .row-fluid
           .span8
             .hero-unit
-              h2 
+              h2
                 | viewmodel
                 //- small  - translation made easy
-              p viewmodel is a node.js module for multiple databases. It can be very useful if you work with (d)ddd, cqrs, eventdenormalizer, host, etc. 
+              p viewmodel is a node.js module for multiple databases. It can be very useful if you work with (d)ddd, cqrs, eventdenormalizer, host, etc.
 
           .span4.downloads
             p node.js:
@@ -25,12 +25,12 @@ html(lang="en")
                 | npm install viewmodel
 
             p
-              | Build status: 
+              | Build status:
               a(href='https://travis-ci.org/adrai/node-viewmodel')
                 img(src='https://img.shields.io/travis/adrai/node-viewmodel.svg')
 
             p
-              | Release: 
+              | Release:
               a(href='https://npmjs.org/package/viewmodel')
                 img(src='https://img.shields.io/npm/v/viewmodel.svg')
 
@@ -57,7 +57,7 @@ html(lang="en")
                   pre
                     code
                       | var viewmodel = require('viewmodel');
-                      | 
+                      |
                       | viewmodel.read(function(err, repository) {
                       |       if(err) {
                       |           console.log('ohhh :-(');
@@ -77,7 +77,7 @@ html(lang="en")
                   pre
                     code
                       | var viewmodel = require('viewmodel');
-                      | 
+                      |
                       | viewmodel.write(
                       |     {
                       |         type: 'mongodb',
@@ -86,7 +86,7 @@ html(lang="en")
                       |         dbName: 'viewmodel',    // optional
                       |         username: 'user',       // optional
                       |         password: 'pwd'         // optional
-                      |     }, 
+                      |     },
                       |     function(err, repository) {
                       |         if(err) {
                       |             console.log('ohhh :-(');
@@ -153,14 +153,14 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     vm.set('myProp', 'myValue');
                       |     vm.set('myProp.deep', 'myValueDeep');
-                      | 
+                      |
                       |     console.log(vm.toJSON());
-                      | 
+                      |
                       |     console.log(vm.has('myProp.deep'));
-                      | 
+                      |
                       |     dummyRepo.commit(vm, function(err) {
                       |     });
                       |     // or you can call commit directly on vm...
@@ -182,7 +182,7 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     // vms is an array
                       |     var firstItem = vms[0];
                       |     console.log('the id: ' + firstItem.id);
@@ -203,7 +203,7 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     // vms is an array
                       |     var firstItem = vms[0];
                       |     console.log('the id: ' + firstItem.id);
@@ -225,7 +225,7 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     console.log('the id: ' + vm.id);
                       |     console.log('the saved value: ' + vm.get('color'));
                       | });
@@ -244,9 +244,9 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     vm.destroy();
-                      | 
+                      |
                       |     dummyRepo.commit(vm, function(err) {
                       |     });
                       |     // or you can call commit directly on vm...
@@ -272,8 +272,24 @@ html(lang="en")
                       |         console.log('ohhh :-(');
                       |         return;
                       |     }
-                      | 
+                      |
                       |     console.log('the new id is: ' + newId);
+                      | });
+
+            .row-fluid
+              .span4
+                h4.feature-title Clear a "collection"
+                p Simply call clear. (only in write mode)
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.clear(function(err) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
                       | });
 
         .row-fluid
@@ -324,7 +340,7 @@ html(lang="en")
                     - azuretable ([azure-storage] (https://github.com/Azure/azure-storage-node))
 
     include ../includes/layout/extra
-      
+
     include ../includes/layout/footer
-    
+
     include ../includes/layout/endscripts
