@@ -460,6 +460,80 @@ html(lang="en")
 
         .row-fluid
           .span12
+            h2 Request denormalizer information
+
+            .row-fluid
+              .span4
+                h4.feature-title After the initialization you can request the denormalizer information:
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | denorm.init(function (err) {
+                      |   denorm.getInfo();
+                      |   // ==>
+                      |   // {
+                      |   //   "collections": [
+                      |   //     {
+                      |   //       "name": "person",
+                      |   //       "viewBuilders": [
+                      |   //         {
+                      |   //           "name": "enteredNewPerson",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         },
+                      |   //         {
+                      |   //           "name": "registeredEMailAddress",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         }
+                      |   //       ],
+                      |   //       "eventExtenders": [
+                      |   //         {
+                      |   //           "name": "enteredNewPerson",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         }
+                      |   //       ]
+                      |   //     },
+                      |   //     {
+                      |   //       "name": "personDetail",
+                      |   //       "viewBuilders": [
+                      |   //         {
+                      |   //           "name": "enteredNewPerson",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         },
+                      |   //         {
+                      |   //           "name": "registeredEMailAddress",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         }
+                      |   //       ],
+                      |   //       "eventExtenders": []
+                      |   //     }
+                      |   //   ],
+                      |   //   "generalEventExtenders": [
+                      |   //     {
+                      |   //       "name": "",
+                      |   //       "aggregate": null,
+                      |   //       "context": null,
+                      |   //       "version": -1
+                      |   //     }
+                      |   //   ]
+                      |   // }
+                      | });
+
+
+
+        .row-fluid
+          .span12
             h2 Components definition
 
             .row-fluid
