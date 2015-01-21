@@ -165,6 +165,23 @@ html(lang="en")
                       |   }
                       | });
 
+
+            .row-fluid
+              .span4
+                h4.feature-title Exposed errors
+                p You can use this for example in you custom command handlers.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | require('cqrs-domain').errors.ValidationError
+                      | require('cqrs-domain').errors.BusinessRuleError
+                      | require('cqrs-domain').errors.AggregateDestroyedError
+                      | require('cqrs-domain').errors.AggregateConcurrencyError
+                      | require('cqrs-domain').errors.ConcurrencyError
+
+
             .row-fluid
               .span4
                 h4.feature-title Catch connect ad disconnect events
