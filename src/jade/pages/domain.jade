@@ -616,15 +616,18 @@ html(lang="en")
                       |   //          "commands": [
                       |   //            {
                       |   //              "name": "enterNewPerson",
-                      |   //              "version": 0
+                      |   //              "version": 0,
+                      |   //              "preconditions": [...]
                       |   //            },
                       |   //            {
                       |   //              "name": "unregisterAllContactInformation",
-                      |   //              "version": 2
+                      |   //              "version": 2,
+                      |   //              "preconditions": [...]
                       |   //            },
                       |   //            {
                       |   //              "name": "unregisterAllContactInformation",
-                      |   //              "version": 1
+                      |   //              "version": 1,
+                      |   //              "preconditions": [...]
                       |   //            }
                       |   //          ],
                       |   //          "events": [
@@ -648,13 +651,7 @@ html(lang="en")
                       |   //              "name": "unregisteredPhoneNumber",
                       |   //              "version": 0
                       |   //            }
-                      |   //          ],
-                      |   //          "preConditions": [
-                      |   //            {
-                      |   //              "name": "",
-                      |   //              "description": "authorization"
-                      |   //            }
-                      |   //          ],
+                      |   //          ]
                       |   //          "businessRules": [
                       |   //            {
                       |   //              "name": "atLeast1EMail",
@@ -801,6 +798,7 @@ html(lang="en")
                       |   // the command name
                       |   // optional, default is file name without extension
                       |   // if name is '' it will handle all commands that matches the appropriate aggregate
+                      |   // if name is an array of strings it will handle all commands that matches the appropriate name
                       |   name: 'unregisterAllContactInformation',
                       | 
                       |   // optional, default 0
