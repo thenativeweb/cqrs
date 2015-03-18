@@ -212,6 +212,27 @@ html(lang="en")
 
             .row-fluid
               .span4
+                h4.feature-title FindOne...
+                p The query object is like the mongodb query object.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | dummyRepo.findOne({ color: 'green' }, function(err, vm) {
+                      |     if(err) {
+                      |         console.log('ohhh :-(');
+                      |         return;
+                      |     }
+                      | 
+                      |     console.log('the id: ' + vm.id);
+                      |     if (vm.has('color')) {
+                      |         console.log('the saved value: ' + vm.get('color'));
+                      |     }
+                      | });
+
+            .row-fluid
+              .span4
                 h4.feature-title Find/Get by id...
                 p Calling get with an id will try to fetch the preferred viewmodel from the repository.
                 p If an object with such an id does not exists the returning viewmodel is null.
@@ -338,6 +359,7 @@ html(lang="en")
                     - tingodb ([tingodb] (https://github.com/sergeyksv/tingodb))
                     - redis ([redis] (https://github.com/mranney/node_redis))
                     - azuretable ([azure-storage] (https://github.com/Azure/azure-storage-node))
+                    - documentdb ([documentdb] (https://github.com/Azure/azure-documentdb-node), [doqmentdb] (https://github.com/a8m/doqmentdb))
 
     include ../includes/layout/extra
 
