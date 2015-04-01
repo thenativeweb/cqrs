@@ -740,6 +740,18 @@ html(lang="en")
                       |   var names = data.name.split(' ');
                       |   aggregate.set('firstname', names[0]);
                       |   aggregate.set('lastname', names[1]);
+                      | })
+                      | // optionally, define idGenerator function for new aggregate ids
+                      | // sync
+                      | .defineAggregateIdGenerator(function () {
+                      |   return require('node-uuid').v4().toString();
+                      | });
+                      | // or async
+                      | .defineAggregateIdGenerator(function (callback) {
+                      |   setTimeout(function () {
+                      |     var id = require('node-uuid').v4().toString();
+                      |     callback(null, id);
+                      |   }, 50);
                       | });
 
             .row-fluid
