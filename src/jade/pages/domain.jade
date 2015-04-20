@@ -407,6 +407,36 @@ html(lang="en")
 
             .row-fluid
               .span4
+                h4.feature-title Define the aggregate id generator function [optional]
+                p you can define a synchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.aggregateIdGenerator(function () {
+                      |   var id = require('node-uuid').v4().toString();
+                      |   return id;
+                      | });
+
+            .row-fluid
+              .span4
+                //- h4.feature-title Define the id generator function [optional]
+                p or you can define an asynchronous function
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | domain.aggregateIdGenerator(function (callback) {
+                      |   setTimeout(function () {
+                      |     var id = require('node-uuid').v4().toString();
+                      |     callback(null, id);
+                      |   }, 50);
+                      | });
+
+            .row-fluid
+              .span4
                 h4.feature-title Wire up events [optional]
                 p you can define a synchronous function
 
