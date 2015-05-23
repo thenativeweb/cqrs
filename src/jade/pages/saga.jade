@@ -267,7 +267,6 @@ html(lang="en")
             .row-fluid
               .span4
                 h4.feature-title Wire up missing events [optional]
-                p you can define a synchronous function
 
               .span8
                 .feature
@@ -285,6 +284,22 @@ html(lang="en")
                       |   pm.handle(missingEvent, function (err) {
                       |     if (err) { console.log(err); }
                       |   });
+                      | 
+                      | });
+
+            .row-fluid
+              .span4
+                p you can get the last guarded event:
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | pm.getLastEvent(function (err, evt) {
+                      |   
+                      |   if (event.occurredAt < Date.now()) {
+                      |     // ...
+                      |   }
                       | 
                       | });
 
