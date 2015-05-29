@@ -559,7 +559,8 @@ html(lang="en")
                       |   // - BusinessRuleError
                       |   //   {
                       |   //     name: 'BusinessRuleError',
-                      |   //     message: 'some message'
+                      |   //     message: 'some message',
+                      |   //     more: { /* more infos */ }
                       |   //   }
                       |   // - AggregateDestroyedError
                       |   //   {
@@ -868,6 +869,8 @@ html(lang="en")
                       |     // return callback(new Error('not personalized'));
                       |     // or
                       |     // return callback(new Error()); // if no error message is defined then the description will be taken
+                      |     // or
+                      |     // return callback(new require('cqrs-domain').BusinessRuleError('not personalized', { /* more infos */ }));
                       |   }
                       |   callback(null);
                       | 
@@ -882,6 +885,8 @@ html(lang="en")
                       |   //   // throw new Error(); // if no error message is defined then the description will be taken
                       |   //   // or
                       |   //   // throw new Error('not personalized');
+                      |   //   // or
+                      |   //   // throw new require('cqrs-domain').BusinessRuleError('not personalized', { /* more infos */ });
                       |   // }
                       | });
 
@@ -986,6 +991,8 @@ html(lang="en")
                       |     // return callback(new Error('names not valid'));
                       |     // or
                       |     // return callback(new Error()); // if no error message is defined then the description will be taken
+                      |     // or
+                      |     // return callback(new require('cqrs-domain').BusinessRuleError('names not valid', { /* more infos */ }));
                       |   }
                       |   callback(null);
                       | 
@@ -1000,6 +1007,8 @@ html(lang="en")
                       |   //   // throw new Error(); // if no error message is defined then the description will be taken
                       |   //   // or
                       |   //   // throw new Error('names not valid');
+                      |   //   // or
+                      |   //   // throw new require('cqrs-domain').BusinessRuleError('names not valid', { /* more infos */ });
                       |   // }
                       | });
 
