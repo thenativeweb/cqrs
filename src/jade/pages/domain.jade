@@ -162,6 +162,21 @@ html(lang="en")
                       |     prefix: 'domain_aggregate_lock',            // optional
                       |     timeout: 10000                              // optional
                       |     // password: 'secret'                          // optional
+                      |   },
+                      |  
+                      |   // optional, default is not set
+                      |   // checks if command was already seen in the last time -> ttl
+                      |   // currently supports: mongodb, redis, tingodb and inmemory
+                      |   // hint settings like: [eventstore](https://github.com/adrai/node-eventstore#provide-implementation-for-storage)
+                      |   deduplication: {
+                      |     type: 'redis',
+                      |     ttl: 1000 * 60 * 60 * 1, // 1 hour          // optional
+                      |     host: 'localhost',                          // optional
+                      |     port: 6379,                                 // optional
+                      |     db: 0,                                      // optional
+                      |     prefix: 'domain_aggregate_lock',            // optional
+                      |     timeout: 10000                              // optional
+                      |     // password: 'secret'                          // optional
                       |   }
                       | });
 
@@ -197,6 +212,12 @@ html(lang="en")
                       |     return myLock({
                       |        // ....
                       |     });
+                      |   },
+                      |  
+                      |   deduplication: : function () {
+                      |     return myCommandBumper({
+                      |        // ....
+                      |     });
                       |   }
                       | });
 
@@ -230,6 +251,13 @@ html(lang="en")
                       |   f:  getAll(aggregateId, function(err, workerIds))
                       |   f:  resolve(aggregateId, function(err))
                       | 
+                      | Command Bumper:
+                      | 
+                      |   f: connect(function(err, lock))
+                      |   f: disconnect(function(err))
+                      |   f: getNewId(function(err, id))
+                      |   f: add(key, ttl, function(err, added))
+                      | 
                       | where:
                       | 
                       |   f:  function
@@ -250,6 +278,7 @@ html(lang="en")
                       | require('cqrs-domain').errors.AggregateDestroyedError
                       | require('cqrs-domain').errors.AggregateConcurrencyError
                       | require('cqrs-domain').errors.ConcurrencyError
+                      | require('cqrs-domain').errors.DuplicateCommandError
 
 
             .row-fluid
@@ -278,8 +307,17 @@ html(lang="en")
                       |   console.log('aggregateLock disconnected');
                       | });
                       | 
+                      | // commandBumper
+                      | domain.commandBumper.on('connect', function() {
+                      |   console.log('commandBumper connected');
+                      | });
                       | 
-                      | // anything (eventStore or aggregateLock)
+                      | domain.commandBumper.on('disconnect', function() {
+                      |   console.log('commandBumper disconnected');
+                      | });
+                      | 
+                      | 
+                      | // anything (eventStore or aggregateLock or commandBumper)
                       | domain.on('connect', function() {
                       |   console.log('something connected');
                       | });
