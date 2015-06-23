@@ -797,6 +797,20 @@ html(lang="en")
                       |   return events.length >= 200;
                       | })
                       | 
+                      | // optionally, define if snapshot should be ignored
+                      | // if true, the whole event stream will be loaded
+                      | .defineIgnoreSnapshot({
+                      |   version: 0
+                      | }, function (data) {
+                      |   return true;
+                      | })
+                      | //.defineIgnoreSnapshot({
+                      | //  version: 0
+                      | //}, true)
+                      | //.defineIgnoreSnapshot({
+                      | //  version: 0
+                      | //}) // default true
+                      | 
                       | // optionally, define conversion algorithm for older snapshots
                       | // always convert directly to newest version...
                       | // when loaded a snapshot and it's an older snapshot, a new snapshot with same revision but with newer aggregate version will be created
