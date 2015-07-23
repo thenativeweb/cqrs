@@ -483,13 +483,15 @@ html(lang="en")
                       |   //           "name": "enteredNewPerson",
                       |   //           "aggregate": "person",
                       |   //           "context": "hr",
-                      |   //           "version": 2
+                      |   //           "version": 2,
+                      |   //           "priority": 223
                       |   //         },
                       |   //         {
                       |   //           "name": "registeredEMailAddress",
                       |   //           "aggregate": "person",
                       |   //           "context": "hr",
-                      |   //           "version": 2
+                      |   //           "version": 2,
+                      |   //           "priority": 312
                       |   //         }
                       |   //       ],
                       |   //       "eventExtenders": [
@@ -508,13 +510,15 @@ html(lang="en")
                       |   //           "name": "enteredNewPerson",
                       |   //           "aggregate": "person",
                       |   //           "context": "hr",
-                      |   //           "version": 2
+                      |   //           "version": 2,
+                      |   //           "priority": 110
                       |   //         },
                       |   //         {
                       |   //           "name": "registeredEMailAddress",
                       |   //           "aggregate": "person",
                       |   //           "context": "hr",
-                      |   //           "version": 2
+                      |   //           "version": 2,
+                      |   //           "priority": Infinity
                       |   //         }
                       |   //       ],
                       |   //       "eventExtenders": []
@@ -609,7 +613,10 @@ html(lang="en")
                       |   autoCreate: true,
                       | 
                       |   // optional, if not defined it will pass the whole event...
-                      |   payload: 'payload'
+                      |   payload: 'payload',
+                      |  
+                      |   // optional, default Infinity, all view-builders will be sorted by this value
+                      |   priority: 1
                       | }, function (data, vm) { // instead of function you can define
                       |                          // a string with default handling ('create', 'update', 'delete')
                       |                          // or function that expects a callback (i.e. function (data, vm, callback) {})
@@ -645,7 +652,10 @@ html(lang="en")
                       |   query: { group: 'admins' },
                       | 
                       |   // optional, if not defined it will pass the whole event...
-                      |   payload: 'payload'
+                      |   payload: 'payload',
+                      |  
+                      |   // optional, default Infinity, all view-builders will be sorted by this value
+                      |   priority: 1
                       | }, function (data, vm) { // instead of function you can define
                       |                          // a string with default handling ('create', 'update', 'delete')
                       |                          // or function that expects a callback (i.e. function (data, vm, callback) {})
