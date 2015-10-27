@@ -583,6 +583,10 @@ html(lang="en")
                     pre
                       code
                         | col.loadViewModel('id', function (err, vm) {});
+                    p or
+                    pre
+                      code
+                        | col.loadViewModelIfExists('id', function (err, vm) {});
                     p But be careful with this!
 
             .row-fluid
