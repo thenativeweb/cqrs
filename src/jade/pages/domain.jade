@@ -67,6 +67,13 @@ html(lang="en")
                       |        cmd
                       |         │
                       |         ∨
+                      | ╔═════════════════════╗
+                      | ║ pre-load-conditions ║─────> "rejected"
+                      | ╚═════════════════════╝
+                      |         │
+                      |        cmd
+                      |         │
+                      |         ∨
                       | ╔════════════════╗
                       | ║ pre-conditions ║─────> "rejected"
                       | ╚════════════════╝
@@ -284,7 +291,7 @@ html(lang="en")
 
             .row-fluid
               .span4
-                h4.feature-title Catch connect ad disconnect events
+                h4.feature-title Catch connect and disconnect events
 
               .span8
                 .feature
@@ -875,7 +882,7 @@ html(lang="en")
                     | Each command schema title should match the command name. Example:
                     a(href='https://github.com/adrai/node-cqrs-domain/blob/1.0/test/integration/fixture/set1/hr/person/validationRules/enterNewPerson.json') enterNewPerson.json
                   p
-                    | To support mutliple verstion look at:
+                    | To support multiple versions look at:
                     a(href='https://github.com/adrai/node-cqrs-domain/blob/v2.1.5/test/integration/fixture/set1/hr/person/validationRules/unregisterAllContactInformation.json#L10') unregisterAllContactInformation.json
                     | or:
                     a(href='https://github.com/adrai/node-cqrs-domain/blob/v2.2.0/test/integration/fixture/set1/hr/person/validationRules/unregisterAllContactInformation_v1.json#L3') unregisterAllContactInformation_v1.json
@@ -893,8 +900,76 @@ html(lang="en")
 
             .row-fluid
               .span4
+                h4.feature-title Pre-Load-Condition
+                p Can be used to perform some business rules before handling the command. Contrary to Pre-Conditions, these rules are applied BEFORE the aggregate is loaded.
+                p This allows you to (for example) run checks against external information by using closures.
+                p A Command can have multiple pre-load-conditions.
+
+              .span8
+                .feature
+                  pre
+                    code
+                      | var externalDataLoader = require('some_file');
+                      | 
+                      | module.exports = require('cqrs-domain').definePreLoadCondition({
+                      |   // the command name
+                      |   // optional, default is file name without extension,
+                      |   // if name is '' it will handle all commands that matches the appropriate aggregate
+                      |   // if name is an array of strings it will handle all commands that matches the appropriate name
+                      |   name: 'checkSomeViewModel',
+                      | 
+                      |   // optional, default 0
+                      |   version: 2,
+                      | 
+                      |   // optional, if not defined it will use what is defined as default in aggregate or pass the whole command
+                      |   payload: 'payload',
+                      | 
+                      |   // optional
+                      |   description: 'firstname should always be set',
+                      | 
+                      |   // optional, default Infinity, all pre-conditions will be sorted by this value
+                      |   priority: 1
+                      | }, function (data, callback) {
+                      |   // data is the command data
+                      |   // callback is optional, if not defined as function argument you can throw errors or return errors here (sync way)
+                      | 
+                      |     if (externalDataLoader.get(data.id) !== data.value) {
+                      |       return callback('not allowed');
+                      |       // or
+                      |       // return callback(new Error('not allowed'));
+                      |       // or
+                      |       // return callback(new Error()); // if no error message is defined then the description will be taken
+                      |       // or
+                      |       // return callback(new require('cqrs-domain').BusinessRuleError('not allowed', { /* more infos */ }));
+                      |     }
+                      | 
+                      |   callback(null);
+                      | 
+                      |   // or if callback is not defined as function argument
+                      |   // if (externalDataLoader.get(data.id) !== data.value)
+                      |   //   return 'not allowed';
+                      |   //   // or
+                      |   //   // return new Error('not allowed');
+                      |   //   // or
+                      |   //   // return new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error(); // if no error message is defined then the description will be taken
+                      |   //   // or
+                      |   //   // throw new Error('not allowed');
+                      |   //   // or
+                      |   //   // throw new require('cqrs-domain').BusinessRuleError('not allowed', { /* more infos */ });
+                      |   // }
+                      | });
+
+                  .alert.alert-info.feature-description
+                    h6 Important hint:
+                    p Pre-load conditions are especially useful when you have checks that you want to run on an aggregate, but when it is OK for those checks to run on potentially stale data (eg a view model). By doing these checks before the aggregate is locked, you avoid creating a locking bottleneck at the aggregate level, and can keep your aggregate smaller because the information for those checks is externalized to the domain. This helps for performance if the domain you are in is performance critical, and helps you keep focus on the real, strongly consistent invariants in your domain.
+
+
+            .row-fluid
+              .span4
                 h4.feature-title Pre-Condition
-                p Can be used to perform some business rules before handling the command.
+                p Can be used to perform some business rules before handling the command. The aggregate is locked and loaded before the pre-condition is applied.
                 p A Command can have multiple pre-conditions.
 
               .span8
@@ -955,7 +1030,7 @@ html(lang="en")
               .span4
                 h4.feature-title Command
                 p Collect all needed infos from aggregate to generate your event(s).
-                p Move checks out of here, the correct places are "business rules" or "pre-conditions"!
+                p Move checks out of here, the correct places are "business rules", "pre-conditions" or "pre-load consitions"!
                 p Do NOT manipulate the aggregate here!
 
               .span8
