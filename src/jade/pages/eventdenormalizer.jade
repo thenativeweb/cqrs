@@ -503,6 +503,14 @@ html(lang="en")
                       |   //           "context": "hr",
                       |   //           "version": 2
                       |   //         }
+                      |   //       ],
+                      |   //       "preEventExtenders": [
+                      |   //         {
+                      |   //           "name": "enteredNewPerson",
+                      |   //           "aggregate": "person",
+                      |   //           "context": "hr",
+                      |   //           "version": 2
+                      |   //         }
                       |   //       ]
                       |   //     },
                       |   //     {
@@ -523,7 +531,8 @@ html(lang="en")
                       |   //           "priority": Infinity
                       |   //         }
                       |   //       ],
-                      |   //       "eventExtenders": []
+                      |   //       "eventExtenders": [],
+                      |   //       "preEventExtenders": []
                       |   //     }
                       |   //   ],
                       |   //   "generalEventExtenders": [
@@ -533,7 +542,8 @@ html(lang="en")
                       |   //       "context": null,
                       |   //       "version": -1
                       |   //     }
-                      |   //   ]
+                      |   //   ],
+                      |   //   "generalPreEventExtenders": []
                       |   // }
                       | });
 
@@ -738,6 +748,7 @@ html(lang="en")
                   pre
                     code
                       | module.exports = require('cqrs-eventdenormalizer').defineEventExtender({
+                      | // module.exports = require('cqrs-eventdenormalizer').definePreEventExtender({ // same api as normal EventExtenders but executed before viewBuilder so the extended event can be used
                       |   // optional, default is file name without extension,
                       |   // if name is '' it will handle all events that matches
                       |   name: 'enteredNewPerson',

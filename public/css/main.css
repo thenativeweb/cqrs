@@ -47,7 +47,6 @@ textarea {
 .dropdown .dropdown-menu {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
-  -webkit-border-radius: 6px;
   border-radius: 6px;
 }
 .btn-icon-only {
@@ -64,7 +63,6 @@ textarea {
   padding: 7px 0;
   background: #292929;
   border-bottom: 1px solid #121212;
-  -webkit-border-radius: 0;
   border-radius: 0;
 }
 .navbar-fixed-top {
@@ -90,7 +88,6 @@ textarea {
   display: block;
   width: auto;
   background: #f9f9f9;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   -webkit-box-shadow: 0px 0px 2px #b6b6b6;
   box-shadow: 0px 0px 2px #b6b6b6;
@@ -160,9 +157,7 @@ textarea {
   background: -ms-linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
   background: linear-gradient(to bottom, #fafafa 0%, #e9e9e9 100%);
   border: 1px solid #d5d5d5;
-  -webkit-border-top-left-radius: 5px;
   border-top-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
   border-top-right-radius: 5px;
   -webkit-background-clip: padding-box;
 }
@@ -191,14 +186,11 @@ textarea {
   padding: 20px 15px 15px;
   background: #fff;
   border: 1px solid #d5d5d5;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
 }
 .widget-header+.widget-content {
   border-top: none;
-  -webkit-border-top-left-radius: 0;
   border-top-left-radius: 0;
-  -webkit-border-top-right-radius: 0;
   border-top-right-radius: 0;
 }
 .widget-content:before,
@@ -275,15 +267,11 @@ textarea {
   text-decoration: none;
 }
 .documentation .hero-unit .doc-links .doc-link a.first {
-  -webkit-border-top-left-radius: 5px;
   border-top-left-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 .documentation .hero-unit .doc-links .doc-link a.last {
-  -webkit-border-top-right-radius: 5px;
   border-top-right-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
 .documentation h2,
@@ -391,7 +379,6 @@ textarea {
   -moz-border-radius: 5px;
   -ms-border-radius: 5px;
   -o-border-radius: 5px;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
 }
 #mocha .test.pass.fast .duration {
