@@ -6,6 +6,7 @@ $ cat .gitignore
 .DS_Store
 *.orig
 npm-debug.log
+package-lock.json
 
 # Use wildcards as well
 *~
